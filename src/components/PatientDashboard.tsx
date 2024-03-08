@@ -42,7 +42,7 @@ function PatientDashboard() {
     openModal: false,
   };
   type getDemographicsResult = {
-    abhaAccountId: number;
+    abhaAccountID: number;
     name: string;
     pinCode: string;
     dob: string;

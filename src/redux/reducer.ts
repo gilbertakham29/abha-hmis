@@ -25,7 +25,7 @@ interface HealthInfoData {
   display: string;
 }
 interface DemographicResult {
-  abhaAccountId: number;
+  abhaAccountID: number;
   name: string;
   pinCode: string;
   dob: string;
@@ -54,7 +54,7 @@ const healthInformationTypeData: HealthInfoData[] = [
   },
 ];
 const demographicSearchResult: DemographicResult = {
-  abhaAccountId: 1,
+  abhaAccountID: 1,
   name: "",
   pinCode: "",
   dob: "",
