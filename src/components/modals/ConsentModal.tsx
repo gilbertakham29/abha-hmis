@@ -15,7 +15,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getHealthInformationType, initiateConsent } from "../../api/abha-api";
-import React from "react";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import ConsentAlert from "../alerts/consetAlert";
@@ -34,12 +33,28 @@ const style = {
   borderColor: "#BDBDBD",
 };
 
-function ConsentModal({ isOpen, isClose }) {
-  const date = new Date().toISOString();
-  type T = object;
-  interface RootState {
-    getHealthInfoData: Array<T>;
-  }
+function ConsentModal({
+  isOpen,
+  isClose,
+}: {
+  isOpen: boolean;
+  isClose: () => void;
+}) {
+  type HealthInformationData = [
+    {
+      healthInformationTypeId: number;
+      code: string;
+      display: string;
+      // Add more properties if needed
+    }
+  ];
+
+  type RootState = {
+    getHealthInfoData: HealthInformationData;
+  };
+  //const dateString = new Date();
+  //const date: Date = dateString;
+
   const tomorrow = new Date();
   const [selectedValues, setSelectedValues] = useState({ hiTypesList: [""] });
   const [healthIdValue, setHealthIdValue] = useState("");
@@ -58,58 +73,49 @@ function ConsentModal({ isOpen, isClose }) {
       }
     });
   };
-  const handleHealthId = (event) => {
+  const handleHealthId = (event: React.ChangeEvent<HTMLInputElement>) => {
     setHealthIdValue(event.target.value);
   };
-  const [state, setState] = useState({
-    gilad: true,
-    jason: false,
-    antoine: false,
-  });
+
   const [formData, setFormData] = useState({
     healthId: "",
     facilityId: "IN1410000152",
     requesterName: "",
     requesterType: "REGNO",
     requesterId: "MH1001",
-    permissionFromDate: new Date().toString(),
-    permissionToDate: new Date().toString(),
-    permissionExpiryDate: new Date().toString(),
+    permissionFromDate: new Date().toISOString(),
+    permissionToDate: new Date().toISOString(),
+    permissionExpiryDate: new Date().toISOString(),
     hiTypesList: [],
   });
-  const handleFromDateChange = (date) => {
+  const handleFromDateChange = (date: string) => {
     setFormData({
       ...formData,
       permissionFromDate: date,
     });
   };
-  const handleToDateChange = (date) => {
+  const handleToDateChange = (date: string) => {
     setFormData({
       ...formData,
       permissionToDate: date,
     });
   };
-  const handleFromExpiryChange = (date) => {
+  const handleFromExpiryChange = (date: string) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     setFormData({
       ...formData,
       permissionExpiryDate: date,
     });
   };
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.checked,
-    });
-  };
 
-  const handleFormData = (name) => (e) => {
-    const value = e.target.value;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+  const handleFormData =
+    (name: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    };
   const handleSubmit = async () => {
     setLoading(true);
     const result = await initiateConsent(
@@ -252,7 +258,7 @@ function ConsentModal({ isOpen, isClose }) {
               <DateTimePicker
                 sx={{ mb: 2 }}
                 value={formData.permissionFromDate}
-                onChange={handleFromDateChange}
+                onChange={() => handleFromDateChange}
                 slotProps={{ textField: { variant: "standard" } }}
               />
             </LocalizationProvider>
@@ -273,7 +279,7 @@ function ConsentModal({ isOpen, isClose }) {
               <DateTimePicker
                 sx={{ mb: 2 }}
                 value={formData.permissionToDate}
-                onChange={handleToDateChange}
+                onChange={() => handleToDateChange}
                 slotProps={{ textField: { variant: "standard" } }}
               />
             </LocalizationProvider>
@@ -331,9 +337,8 @@ function ConsentModal({ isOpen, isClose }) {
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
                 value={formData.permissionExpiryDate}
-                onChange={(date) => handleFromExpiryChange(date)}
+                onChange={() => handleFromExpiryChange}
                 sx={{ mb: 2 }}
-                minDate={date}
                 slotProps={{ textField: { variant: "standard" } }}
               />
             </LocalizationProvider>

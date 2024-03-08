@@ -11,18 +11,72 @@ import {
   getHealthInfo,
   getConsentHeaderList,
 } from "./action";
+interface ConsentHeaders {
+  abhaConsentHeaderId: string;
+  healthId: string;
+  consentStatus: string;
+  fetchFromDate: string;
+  fetchToDate: string;
+  permissionExpiryDate: string;
+}
+interface HealthInfoData {
+  healthInformationTypeId: number;
+  code: string;
+  display: string;
+}
+interface DemographicResult {
+  abhaAccountId: number;
+  name: string;
+  pinCode: string;
+  dob: string;
+  address: string;
+  mobile: string;
+  healthIdNumber: string;
+  healthId: string;
+}
+type abhaCardData = string;
+type abhaQrData = string;
+const initialConsentHeaderData: ConsentHeaders[] = [
+  {
+    abhaConsentHeaderId: "",
+    healthId: "",
+    consentStatus: "",
+    fetchFromDate: "",
+    fetchToDate: "",
+    permissionExpiryDate: "",
+  },
+];
+const healthInformationTypeData: HealthInfoData[] = [
+  {
+    healthInformationTypeId: 1,
+    code: "",
+    display: "",
+  },
+];
+const demographicSearchResult: DemographicResult = {
+  abhaAccountId: 1,
+  name: "",
+  pinCode: "",
+  dob: "",
+  address: "",
+  mobile: "",
+  healthIdNumber: "",
+  healthId: "",
+};
+const abhaCardDataResponse: abhaCardData = "";
+const abhaQrDataResponse: abhaQrData = "";
 const initialState = {
-  searchResult: {},
-  abhaCardResult: "",
-  abhaQrCode: "",
+  searchResult: demographicSearchResult,
+  abhaCardResult: abhaCardDataResponse,
+  abhaQrCode: abhaQrDataResponse,
   abhaInitiation: {},
   createHealthIdWithAadhaar: {}, // corrected typo in variable name
   aadhaarVerification: {},
   resendAadhaarOtp: {},
   mobileOtp: {},
   prescriptions: [],
-  getHealthInfoData: [],
-  getConsentHeaderData: [],
+  getHealthInfoData: healthInformationTypeData,
+  getConsentHeaderData: initialConsentHeaderData,
 };
 
 type State = typeof initialState;
@@ -94,7 +148,7 @@ const rootReducer = (state: State = initialState, action: Actions) => {
       };
     case "GET_CONSENT_HEADER":
       return {
-        ...state,
+        state,
         getConsentHeaderData: action.payload,
       };
     default:

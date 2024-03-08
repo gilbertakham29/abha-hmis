@@ -227,9 +227,9 @@ export const initiateConsent = async (
   requesterNameInput: string,
   requesterTypeInput: string,
   requesterIdInput: string,
-  permissionFromDateInput: string,
-  permissionToDateInput: string,
-  permissionExpiryDateInput: string,
+  permissionFromDateInput: string | null,
+  permissionToDateInput: string | null,
+  permissionExpiryDateInput: string | null,
   hiTypesListInput: string[]
 ) => {
   const data = {
@@ -270,8 +270,8 @@ export const getHealthInformationType = async (dispatch: Dispatch) => {
 };
 export const getConsentHeaders = async (
   facilityInput: string,
-  fromDateInput: string,
-  toDateInput: string,
+  fromDateInput: string | null,
+  toDateInput: string | null,
   dispatch: Dispatch
 ) => {
   const data = {

@@ -1,19 +1,6 @@
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Menu,
-  MenuItem,
-} from "@mui/material";
-import { useState } from "react";
+import { AppBar, Toolbar, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 function Navbar() {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
   return (
     <AppBar position="static" color="primary">
       <Toolbar
@@ -28,7 +15,6 @@ function Navbar() {
       >
         <Link to="/patient" style={{ textDecoration: "none", color: "#fff" }}>
           <Typography
-            onClick={handleClick}
             variant="h6"
             component="div"
             sx={{ fontSize: 16, fontStyle: "bold" }}

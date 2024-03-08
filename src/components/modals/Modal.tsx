@@ -23,11 +23,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import SuccessDialog from "./SuccessDialog";
 import AadhaarAlert from "../alerts/AadhaarAlert";
 import VerifyAadhaarAlert from "../alerts/verifyAadhaar";
 import MobileOtpAlert from "../alerts/mobileOtpAlert";
 import VerifyMobileOtpAlert from "../alerts/verifyMobileOtp";
+import SuccessDialog from "./SuccessDialog";
 const style = {
   position: "absolute",
   top: "50%",
@@ -43,7 +43,13 @@ const style = {
   py: 2,
   borderColor: "#BDBDBD",
 };
-function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
+function ModalPopup({
+  isOpen,
+  isClose,
+}: {
+  isOpen: boolean;
+  isClose: () => void;
+}) {
   type T = object;
   interface RootState {
     searchResult: Array<T>;
@@ -51,7 +57,7 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
     abhaQrCode: string;
   }
   const [aadhaarOtpInput, setAadhaarOtpInput] = useState(false);
-  const [openModal, setOpenModal] = useState(false);
+  //const [openModal, setOpenModal] = useState(false);
   const [aadhharOtpVerfiy, setAadhaarOtpVerify] = useState("");
   const [mobileInput, setMobileInput] = useState(0);
   const [mobileNumber, setMobileNumber] = useState(false);
@@ -93,12 +99,12 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
       ]);
       console.log(abhaCard, abhaQr);
 
-      setOpenModal(isClose);
+      //setOpenModal(isClose);
       console.log(setError("error"));
     }, 1000);
   };
   useEffect(() => {
-    let timer;
+    let timer: string | number | NodeJS.Timeout | undefined;
     if (countdown > 0) {
       timer = setTimeout(() => {
         setCountdown(countdown - 1);
@@ -217,15 +223,13 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
     }, 2000);
     console.log(result);
   };
-  const handleAdhaarInput = (e) => {
+  const handleAdhaarInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAadhaarInput(e.target.value);
   };
   const handleClose = () => {
     setOpenDialog(false);
   };
-  const handleAlertClose = () => {
-    setAlert(false);
-  };
+
   const handleChange = () => {
     setChecked(true);
   };
@@ -235,7 +239,6 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
       <Modal
         open={isOpen}
         onClose={isClose}
-        sx={{ contentVisibility: openDialog ? "hidden" : isOpen }}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -259,8 +262,8 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
               <IconButton
                 edge="start"
                 color="inherit"
-                onClick={isClose}
                 aria-label="close"
+                onClick={isClose}
               >
                 <CloseIcon />
               </IconButton>
@@ -531,7 +534,7 @@ function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
       {openDialog && (
         <SuccessDialog isOpen={openDialog} onClose={handleClose} />
       )}
-      {alert && <AadhaarAlert isOpen={alert} onClose={handleAlertClose} />}
+      {alert && <AadhaarAlert isOpen={alert} />}
       {aadhaarAlert && <VerifyAadhaarAlert isOpen={aadhaarAlert} />}
       {mobileAlert && <MobileOtpAlert isOpen={mobileAlert} />}
       {mobileOtpAlert && <VerifyMobileOtpAlert isOpen={mobileOtpAlert} />}

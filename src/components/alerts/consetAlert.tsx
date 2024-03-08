@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
 
-export default function ConsentAlert({ isOpen }) {
+export default function ConsentAlert({ isOpen }: { isOpen: boolean }) {
   return (
     <>
       {isOpen && (

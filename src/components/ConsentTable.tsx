@@ -60,14 +60,28 @@ const columns: Column[] = [
   },
 ];
 
-type T = object;
-interface RootState {
-  getConsentHeaderData: Array<T>;
-}
+//interface RootState {
+//getConsentHeaderData: Array<T>;
+//}
+type ConsentHeader = [
+  {
+    abhaConsentHeaderId: string;
+    healthId: string;
+    consentStatus: string;
+    fetchFromDate: string;
+    fetchToDate: string;
+    permissionExpiryDate: string;
+    // Add more properties if needed
+  }
+];
+
+type RootState = {
+  getConsentHeaderData: ConsentHeader;
+};
 export default function ConsentTable() {
   const initialState = {
-    dateFrom: new Date().toISOString(),
-    dateTo: new Date().toISOString(),
+    dateFrom: null,
+    dateTo: null,
   };
 
   const consentHeaderList = useSelector(
@@ -81,7 +95,7 @@ export default function ConsentTable() {
   const [progress, setProgress] = React.useState(false);
   const { dateFrom, dateTo } = state;
   const dispatch = useDispatch();
-  const handleConsentSearch = async (fromDate: string, toDate: string) => {
+  const handleConsentSearch = async (fromDate: null, toDate: null) => {
     setProgress(true);
     setTimeout(() => {
       setProgress(false);
@@ -94,16 +108,16 @@ export default function ConsentTable() {
     );
     console.log(result);
   };
-  const handleChangePage = (event: unknown, newPage: number) => {
+  const handleChangePage = (newPage: number) => {
     setPage(newPage);
   };
-  const handleDateFrom = (date) => {
+  const handleDateFrom = (date: null) => {
     setState({
       ...state,
       dateFrom: date,
     });
   };
-  const handleDateTo = (date) => {
+  const handleDateTo = (date: null) => {
     setState({
       ...state,
       dateTo: date,
@@ -158,7 +172,7 @@ export default function ConsentTable() {
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                          value={dateFrom}
+                          value={state.dateFrom}
                           onChange={handleDateFrom}
                           slotProps={{ textField: { variant: "outlined" } }}
                         />
@@ -177,7 +191,7 @@ export default function ConsentTable() {
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
-                          value={dateTo}
+                          value={state.dateTo}
                           onChange={handleDateTo}
                           slotProps={{ textField: { variant: "outlined" } }}
                         />
@@ -265,11 +279,10 @@ export default function ConsentTable() {
 
         <TablePagination
           rowsPerPageOptions={[5, 25, 100]}
-          component="div"
           count={consentHeaderList.length}
           rowsPerPage={rowsPerPage}
           page={page}
-          onPageChange={handleChangePage}
+          onPageChange={() => handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>

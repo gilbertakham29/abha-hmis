@@ -21,9 +21,8 @@ import InfoIcon from "@mui/icons-material/Info";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ModalPopup from "./modals/Modal";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import PatientList from "./PatientList";
-function calculateAge(dateOfBirth) {
+function calculateAge(dateOfBirth: number) {
   const today = new Date();
   const birthDate = new Date(dateOfBirth);
   let age = today.getFullYear() - birthDate.getFullYear();
@@ -42,16 +41,38 @@ function PatientDashboard() {
     abhaGenerate: false,
     openModal: false,
   };
-
+  type getDemographicsResult = {
+    abhaAccountId: number;
+    name: string;
+    pinCode: string;
+    dob: string;
+    address: string;
+    mobile: string;
+    healthIdNumber: string;
+    healthId: string;
+  };
+  type abhaCardResponse = string;
+  type abhaQrResponse = string;
+  type RootState = {
+    searchResult: getDemographicsResult;
+  };
+  type abhaCardState = {
+    abhaCardResult: abhaCardResponse;
+  };
+  type abhaQrState = {
+    abhaQrCode: abhaQrResponse;
+  };
   const [state, setState] = useState(initialState);
-  const { showForm, abhaGenerate, openModal } = state;
+  const { showForm, openModal } = state;
   const searchResult = useSelector((state: RootState) => state.searchResult);
   const abhaCardResult = useSelector(
-    (state: RootState) => state.abhaCardResult
+    (state: abhaCardState) => state.abhaCardResult
   );
-  const abhaQrCodeResult = useSelector((state: RootState) => state.abhaQrCode);
+  const abhaQrCodeResult = useSelector(
+    (state: abhaQrState) => state.abhaQrCode
+  );
   console.log(searchResult);
-  const age = calculateAge(searchResult.dob);
+  const age = calculateAge(Number(searchResult.dob));
   console.log(age);
 
   const patientDetails = () => {

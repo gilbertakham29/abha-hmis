@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Alert from "@mui/material/Alert";
 
-export default function MobileOtpAlert({ isOpen }) {
+export default function MobileOtpAlert({ isOpen }: { isOpen: boolean }) {
   return (
     <>
       {isOpen && (
