@@ -7,295 +7,45 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
+
   return (
-    <AppBar position="static">
+    <AppBar position="static" color="primary">
       <Toolbar
         sx={{
           display: "flex",
           flexDirection: "row",
-          justifyContent: "space-between",
+          justifyContent: "flex-start",
           alignItems: "center",
-          backgroundColor: "#000GA",
+
+          gap: 12,
         }}
       >
-        <Menu
-          id="simple-menu"
-          sx={{ minWidth: 120, border: "solid", borderRight: 1 }}
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
+        <Link to="/patient" style={{ textDecoration: "none", color: "#fff" }}>
           <Typography
             onClick={handleClick}
             variant="h6"
             component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
+            sx={{ fontSize: 16, fontStyle: "bold" }}
           >
-            OPD
+            PATIENT REGISTRATION
           </Typography>
-        </IconButton>
+        </Link>
 
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
+        <Link to="/consent" style={{ textDecoration: "none", color: "#fff" }}>
           <Typography
             variant="h6"
             component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
+            sx={{ fontSize: 16, fontStyle: "bold" }}
           >
-            IPD
+            CONSENT FORM
           </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            OT
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            REPORTS
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            STORE
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            ACCOUNTS
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            DIAGNOSTICS
-          </Typography>{" "}
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            REPORT
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            HOUSEKEEPING
-          </Typography>
-        </IconButton>
-
-        <Menu
-          id="simple-menu"
-          anchorEl={anchorEl}
-          open={Boolean(anchorEl)}
-          onClose={handleClose}
-        >
-          <MenuItem>Option 1</MenuItem>
-          <MenuItem>Option 2</MenuItem>
-          <MenuItem>Option 3</MenuItem>
-        </Menu>
-
-        <IconButton
-          size="large"
-          onClick={handleClick}
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-        >
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ fontSize: 18, fontFamily: "monospace" }}
-          >
-            MRD
-          </Typography>
-        </IconButton>
+        </Link>
       </Toolbar>
     </AppBar>
   );

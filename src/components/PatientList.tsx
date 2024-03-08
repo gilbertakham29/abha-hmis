@@ -20,28 +20,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import departments from "../../data.json";
 import { useState } from "react";
-function createData(
-  name: string,
-  calories: number,
-  fat: number,
-  carbs: number,
-  protein: number
-) {
-  return { name, calories, fat, carbs, protein };
-}
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
 
 function PatientList() {
   const [showTable, setShowTable] = useState(false);
   const openTable = () => {
     setShowTable(true);
   };
+
   return (
     <>
       <Container
@@ -195,19 +180,20 @@ function PatientList() {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: "#00E676",
-                ":hover": { backgroundColor: "#00C853" },
+                backgroundColor: "#039BE5",
+                ":hover": { backgroundColor: "#0288D1" },
               }}
               size="medium"
               onClick={openTable}
             >
               Search
             </Button>
-            <Button size="medium" variant="outlined">
+            <Button
+              size="medium"
+              sx={{ color: "#BDBDBD", borderColor: "#EEEEEE" }}
+              variant="outlined"
+            >
               Reset
-            </Button>
-            <Button variant="contained" size="medium">
-              Print
             </Button>
           </div>
         </Box>
@@ -227,9 +213,9 @@ function PatientList() {
                 <TableCell>ADDED ON</TableCell>
                 <TableCell>MOBILE NO</TableCell>
                 <TableCell>ADDED BY</TableCell>
-                <TableCell>REMARKS</TableCell>
-                <TableCell>EDIT</TableCell>
-                <TableCell>DELETE</TableCell>
+
+                <TableCell>ACTION</TableCell>
+
                 <TableCell>CREATE ABHA</TableCell>
               </TableRow>
             </TableHead>
@@ -246,23 +232,29 @@ function PatientList() {
                 <TableCell>Khagempalli</TableCell>
                 <TableCell>02-11-2023:03:41:02</TableCell>
                 <TableCell>G. A. Sangeeta Devi</TableCell>
-                <TableCell>24 </TableCell>
+                <TableCell>Ravi</TableCell>
+
                 <TableCell>
-                  <input style={{ width: "50%" }} />
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                    }}
+                  >
+                    <IconButton>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </TableCell>
-                <TableCell>
-                  <IconButton>
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell>
-                  <IconButton>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+
                 <TableCell>
                   <Button
                     variant="contained"
+                    size="small"
                     sx={{ fontSize: "0.6rem", height: 42 }}
                   >
                     CREATE ABHA
@@ -271,7 +263,7 @@ function PatientList() {
               </TableRow>
               <TableRow>
                 <TableCell component="th" scope="row">
-                  1
+                  2
                 </TableCell>
                 <TableCell>KAHRI-HID2318207</TableCell>
                 <TableCell>Miss. Khumukcham Priya </TableCell>
@@ -281,20 +273,25 @@ function PatientList() {
                 <TableCell>Khagempalli</TableCell>
                 <TableCell>02-11-2023:03:41:02</TableCell>
                 <TableCell>G. A. Sangeeta Devi</TableCell>
-                <TableCell>24 </TableCell>
+                <TableCell>Nikhil N</TableCell>
+
                 <TableCell>
-                  <input style={{ width: "50%" }} />
+                  <Box
+                    sx={{
+                      display: "inline-flex",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                    }}
+                  >
+                    <IconButton>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 </TableCell>
-                <TableCell>
-                  <IconButton>
-                    <EditIcon />
-                  </IconButton>
-                </TableCell>
-                <TableCell>
-                  <IconButton>
-                    <DeleteIcon />
-                  </IconButton>
-                </TableCell>
+
                 <TableCell>
                   <Button
                     variant="contained"

@@ -2,14 +2,14 @@ import { Box, Button } from "@mui/material";
 import Navbar from "./Navbar";
 import { useState } from "react";
 import ConsentModal from "./modals/ConsentModal";
+import ConsentTable from "./ConsentTable";
 function ConsentForm() {
   const initialState = {
-    showForm: true,
     abhaGenerate: false,
     openModal: false,
   };
   const [state, setState] = useState(initialState);
-  const { showForm, openModal } = state;
+  const { openModal } = state;
   const handleModal = () => {
     setState({
       ...state,
@@ -31,7 +31,7 @@ function ConsentForm() {
         sx={{
           backgroundColor: "#00E676",
           ":hover": { backgroundColor: "#00C853" },
-          mt: 8,
+          mt: 3,
         }}
         onClick={handleModal}
       >
@@ -39,6 +39,7 @@ function ConsentForm() {
       </Button>
 
       {openModal && <ConsentModal isOpen={openModal} isClose={handleClose} />}
+      <ConsentTable />
     </Box>
   );
 }

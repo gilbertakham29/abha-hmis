@@ -1,17 +1,19 @@
+import { LoadingButton } from "@mui/lab";
+import { Link } from "react-router-dom";
+import logo from "../assets/images/picasoid-logo.png";
+import { useNavigate } from "react-router-dom";
+
 import {
   Checkbox,
-  Button,
   Container,
-  FormControl,
   TextField,
   Typography,
   Grid,
-  Link,
   Box,
   FormControlLabel,
-  Avatar,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import { useState } from "react";
 const Background = styled("div")({
   width: "100%",
   height: "100vh",
@@ -23,6 +25,31 @@ const Background = styled("div")({
   backgroundRepeat: "no-repeat",
 });
 function Login() {
+  const history = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const defaultEmail = "abdmadmin@picasoid.co.in";
+  const defaultPassword = "24@#picafy";
+  const handleLogin = () => {
+    setLoading(true);
+
+    setTimeout(() => {
+      if (email === defaultEmail && password === defaultPassword) {
+        history("/patient"); // Navigate to the next page
+      } else {
+        setError("Invalid email or password!");
+      }
+      setLoading(false);
+    }, 2000);
+  };
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
   return (
     <Background>
       <Container
@@ -31,10 +58,9 @@ function Login() {
           display: "flex",
           jumstifyContent: "center",
           alignItems: "center",
-          border: "solid",
           borderWidth: 1,
-          boxShadow: 8,
-          borderRadius: 4,
+          boxShadow: 4,
+          borderRadius: 3,
           backgroundColor: "#fff",
           paddingTop: 2,
         }}
@@ -42,15 +68,25 @@ function Login() {
       >
         <Box
           sx={{
-            padding: 4,
+            padding: 2,
             display: "flex",
 
             flexDirection: "column",
             alignItems: "center",
           }}
         >
-          <Typography component="h1" variant="h5">
-            Sign in to our platform
+          <img
+            src={logo}
+            alt="picasoid"
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: 34,
+              borderColor: "#fff",
+            }}
+          />
+          <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
+            Sign in to PiCaSoid
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }}>
             <TextField
@@ -58,6 +94,9 @@ function Login() {
               required
               id="email"
               fullWidth
+              error={error !== ""}
+              value={email}
+              onChange={handleEmailChange}
               label="Your Email Address"
               name="email"
               autoComplete="email"
@@ -67,39 +106,60 @@ function Login() {
               margin="normal"
               required
               fullWidth
+              error={error !== ""}
+              helperText={error}
               name="password"
               label="Password"
               type="password"
-              id="password"
+              value={password}
+              onChange={handlePasswordChange}
               sx={{ height: "50px" }}
-              autoComplete="current-password"
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
+              sx={{ mt: 2 }}
             />
-            <Button
+
+            <LoadingButton
               type="submit"
               fullWidth
+              loading={loading}
+              disabled={loading}
+              onClick={handleLogin}
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 1, mb: 2 }}
             >
               Sign In
-            </Button>
+            </LoadingButton>
+
             <Grid container>
               <Grid item xs>
-                <Link href="#" sx={{ textDecoration: "none" }} variant="body2">
-                  Forgot password?
+                <Link to="/register" style={{ textDecoration: "none" }}>
+                  <Typography sx={{ fontSize: 12 }}>
+                    Forgot password?
+                  </Typography>
                 </Link>
               </Grid>
               <Grid item>
-                <Link
-                  href="#"
-                  sx={{ color: "black", textDecoration: "none" }}
-                  variant="body2"
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
                 >
-                  {"Don't have an account? Sign Up"}
-                </Link>
+                  <Typography sx={{ fontSize: 12 }}>
+                    Don't have an account?
+                  </Typography>
+                  <Link
+                    to="/register"
+                    style={{ fontSize: 14, textDecoration: "none" }}
+                  >
+                    Sign up
+                  </Link>
+                </Box>
               </Grid>
             </Grid>
           </Box>

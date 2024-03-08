@@ -8,6 +8,8 @@ import {
   verifyPhoneOtp,
   createHealthIdOtp,
   resendAadhaarOtp,
+  getHealthInfo,
+  getConsentHeaderList,
 } from "./action";
 const initialState = {
   searchResult: {},
@@ -19,6 +21,8 @@ const initialState = {
   resendAadhaarOtp: {},
   mobileOtp: {},
   prescriptions: [],
+  getHealthInfoData: [],
+  getConsentHeaderData: [],
 };
 
 type State = typeof initialState;
@@ -32,7 +36,9 @@ type Actions =
   | ReturnType<typeof verifyAadhaar>
   | ReturnType<typeof resendAadhaarOtp>
   | ReturnType<typeof verifyPhoneOtp>
-  | ReturnType<typeof createHealthIdOtp>;
+  | ReturnType<typeof createHealthIdOtp>
+  | ReturnType<typeof getHealthInfo>
+  | ReturnType<typeof getConsentHeaderList>;
 
 const rootReducer = (state: State = initialState, action: Actions) => {
   switch (action.type) {
@@ -80,6 +86,16 @@ const rootReducer = (state: State = initialState, action: Actions) => {
       return {
         ...state,
         prescriptions: action.payload,
+      };
+    case "GET_HEALTH_INFO":
+      return {
+        ...state,
+        getHealthInfoData: action.payload,
+      };
+    case "GET_CONSENT_HEADER":
+      return {
+        ...state,
+        getConsentHeaderData: action.payload,
       };
     default:
       return state;

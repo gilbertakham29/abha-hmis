@@ -8,6 +8,8 @@ import {
   generatePhoneOtp,
   verifyPhoneOtp,
   resendAadhaarOtp,
+  getHealthInfo,
+  getConsentHeaderList,
 } from "../redux/action";
 
 export const handleSearch = async (
@@ -224,4 +226,76 @@ export const createHealthId = async (
   dispatch(createHealthIdOtp(result));
   console.log(result);
 };
-export const initiateConsent = async(healthIdInput:string,facilityId:string,requesterNameInput:string,requesterIdInput:string,requesterSystemInput:string,permissionTypeInput:string,);
+
+export const initiateConsent = async (
+  healthIdInput: string,
+  facilityIdInput: string,
+  requesterNameInput: string,
+  requesterTypeInput: string,
+  requesterIdInput: string,
+  permissionFromDateInput: string,
+  permissionToDateInput: string,
+  permissionExpiryDateInput: string,
+  hiTypesListInput: string[]
+) => {
+  const data = {
+    healthId: healthIdInput,
+    facilityId: facilityIdInput,
+    requesterName: requesterNameInput,
+    requesterType: requesterTypeInput,
+    requesterId: requesterIdInput,
+    permissionFromDate: permissionFromDateInput,
+    permissionToDate: permissionToDateInput,
+    permissionExpiryDate: permissionExpiryDateInput,
+    hiTypesList: hiTypesListInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbdmM3/InitiateConsentForDataTransfer",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  console.log(result);
+};
+export const getHealthInformationType = async (dispatch) => {
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaBase/GetHealthInformationType",
+    {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }
+  );
+  const result = await response.json();
+  dispatch(getHealthInfo(result));
+  console.log(result);
+};
+export const getConsentHeaders = async (
+  facilityInput: string,
+  fromDateInput: string,
+  toDateInput: string,
+  dispatch
+) => {
+  const data = {
+    facilityId: facilityInput,
+    fromDate: fromDateInput,
+    toDate: toDateInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbdmM3/GetConsentHeaders",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  dispatch(getConsentHeaderList(result));
+  console.log(result);
+};

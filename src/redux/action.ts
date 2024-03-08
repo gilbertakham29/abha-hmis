@@ -34,3 +34,11 @@ export const createHealthIdOtp = (result: string) => ({
   type: "CREATE_HEALTH_ID",
   payload: result,
 });
+export const getHealthInfo = (result: []) => ({
+  type: "GET_HEALTH_INFO",
+  payload: result,
+});
+export const getConsentHeaderList = (result: []) => ({
+  type: "GET_CONSENT_HEADER",
+  payload: result,
+});

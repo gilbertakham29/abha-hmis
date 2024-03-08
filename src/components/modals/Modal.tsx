@@ -1,13 +1,9 @@
 import {
-  Backdrop,
   Box,
   Button,
+  Checkbox,
   Container,
-  FilledInput,
-  FormControl,
-  FormHelperText,
   IconButton,
-  Input,
   Modal,
   OutlinedInput,
   TextField,
@@ -28,6 +24,10 @@ import { LoadingButton } from "@mui/lab";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SuccessDialog from "./SuccessDialog";
+import AadhaarAlert from "../alerts/AadhaarAlert";
+import VerifyAadhaarAlert from "../alerts/verifyAadhaar";
+import MobileOtpAlert from "../alerts/mobileOtpAlert";
+import VerifyMobileOtpAlert from "../alerts/verifyMobileOtp";
 const style = {
   position: "absolute",
   top: "50%",
@@ -52,7 +52,7 @@ function ModalPopup({ isOpen, isClose }) {
   }
   const [aadhaarOtpInput, setAadhaarOtpInput] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const [aadhharOtpVerfiy, setAadhaarOtpVerify] = useState(0);
+  const [aadhharOtpVerfiy, setAadhaarOtpVerify] = useState("");
   const [mobileInput, setMobileInput] = useState(0);
   const [mobileNumber, setMobileNumber] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(false);
@@ -61,11 +61,18 @@ function ModalPopup({ isOpen, isClose }) {
   const [searchMobile, setSearchMobile] = useState("");
   const [btnShow, setBtnShow] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [alert, setAlert] = useState(false);
+  const [aadhaarAlert, setAadhaarAlert] = useState(false);
+  const [mobileAlert, setMobileAlert] = useState(false);
+  const [mobileOtpAlert, setMobileOtpAlert] = useState(false);
   const [error, setError] = useState("");
+  const [aadhaarError, setAadhaarError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   const [resendCount, setResendCount] = useState(0);
-  const [showButton, setShowButton] = useState(true);
+  const [showButton, setShowButton] = useState(false);
   const [countdown, setCountdown] = useState(90);
   const dispatch = useDispatch();
 
@@ -74,30 +81,21 @@ function ModalPopup({ isOpen, isClose }) {
 
   const searchPhoneNumber = async (searchMobile: string) => {
     //const abhaId = await ;
+    setSearchLoading(true);
 
-    const aadhaarRegex = /^\d{12}$/; // Simple regex for 12-digit Aadhaar number
-    if (!aadhaarRegex.test(searchMobile)) {
-      setError("Aadhaar number is not valid!");
-    } else {
-      // Handle submission or further processing
-      setError("");
-      // Reset the input field
-      setSearchMobile("");
-    }
-    // Simulating an asynchronous operation
+    setTimeout(async () => {
+      setSearchLoading(false);
+      const result = await handleSearch(searchMobile, dispatch);
 
-    const result = await handleSearch(searchMobile, dispatch);
-
-    const [abhaCard, abhaQr] = await Promise.all([
-      getAbhaCard(result.abhaAccountID, dispatch),
-      getQrcode(result.abhaAccountID, dispatch),
-    ]);
-    setTimeout(() => {
+      const [abhaCard, abhaQr] = await Promise.all([
+        getAbhaCard(result.abhaAccountID, dispatch),
+        getQrcode(result.abhaAccountID, dispatch),
+      ]);
       setOpenModal(isClose);
     }, 1000);
   };
   useEffect(() => {
-    let timer;
+    let timer: string | number;
     if (countdown > 0) {
       timer = setTimeout(() => {
         setCountdown(countdown - 1);
@@ -116,6 +114,7 @@ function ModalPopup({ isOpen, isClose }) {
       setShowButton(false);
     }
     const result = await resendOtp(aadhaarInput, dispatch);
+    console.log(result);
   };
   const handlePhoneSearch = (e) => {
     setSearchMobile(e.target.value);
@@ -129,25 +128,37 @@ function ModalPopup({ isOpen, isClose }) {
   const handleMobileSubmit = (e) => {
     setMobileInput(e.target.value);
   };
-  const handleAdhaar = (e) => {
-    setAadhaarInput(e.target.value);
-  };
+
   const handleSubmit = async (aadhaarInput: string) => {
+    const aadhaarRegex = /^\d{12}$/; // Simple regex for 12-digit Aadhaar number
+    if (!aadhaarRegex.test(aadhaarInput)) {
+      setAadhaarError("Aadhaar number is not valid!");
+      setShowButton(false);
+      setLoading(false);
+      setAadhaarOtpInput(false);
+    } else {
+      // Handle submission or further processing
+      setAadhaarError("");
+      // Reset the input field
+    }
     const result = await initAbhaRegistration(aadhaarInput, dispatch);
     console.log(result);
+
     setLoading(true);
     // Simulating an asynchronous operation
+
     setTimeout(() => {
       setLoading(false);
       setAadhaarOtpInput(true);
+      setAlert(true);
 
       setBtnShow(false);
-      setOpenResendBtn(false);
+      setTimeout(() => {
+        setAlert(false);
+      }, 3000);
     }, 2000);
   };
-  const handleMobileInput = (e) => {
-    setMobileInput(e.target.value);
-  };
+
   const handleMobile = async (aadhharOtp: number) => {
     setLoading(true);
     const result = await verifyAadhaarOtp(aadhaarInput, aadhharOtp, dispatch);
@@ -156,6 +167,10 @@ function ModalPopup({ isOpen, isClose }) {
       setLoading(false);
       setAadhaarOtpInput(false);
       setMobileNumber(true);
+      setAadhaarAlert(true);
+      setTimeout(() => {
+        setAadhaarAlert(false);
+      }, 3000);
     }, 2000);
 
     console.log(result);
@@ -171,6 +186,10 @@ function ModalPopup({ isOpen, isClose }) {
       setLoading(false);
       setMobileNumber(false);
       setMobileOtp(true);
+      setMobileAlert(true);
+      setTimeout(() => {
+        setMobileAlert(false);
+      }, 3000);
     }, 2000);
     console.log(result);
   };
@@ -183,7 +202,15 @@ function ModalPopup({ isOpen, isClose }) {
     const result = await verifyMobileOtp(aadhaarInput, mobileNumber, dispatch);
     setTimeout(() => {
       setLoading(false);
-      setOpenDialog(true);
+      setMobileOtpAlert(true);
+
+      setTimeout(() => {
+        setOpenDialog(true);
+        setMobileOtpAlert(false);
+        setTimeout(() => {
+          setOpenDialog(false);
+        }, 3000);
+      }, 2000);
     }, 2000);
     console.log(result);
   };
@@ -193,6 +220,13 @@ function ModalPopup({ isOpen, isClose }) {
   const handleClose = () => {
     setOpenDialog(false);
   };
+  const handleAlertClose = () => {
+    setAlert(false);
+  };
+  const handleChange = () => {
+    setChecked(true);
+  };
+
   return (
     <div>
       <Modal
@@ -241,13 +275,12 @@ function ModalPopup({ isOpen, isClose }) {
               onChange={handlePhoneSearch}
               value={searchMobile}
               sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
-              placeholder="Enter AADHHAR/ABHA ID/MOBILE NO."
-              error={!!error}
+              placeholder="Enter AADHAAR/ABHA ID/MOBILE NO."
             />
             {error && (
-              <FormHelperText error sx={{ fontSize: "0.9rem" }}>
+              <Typography sx={{ fontSize: "0.9rem", color: "red", mt: 1 }}>
                 {error}
-              </FormHelperText>
+              </Typography>
             )}
           </Box>
           <Box
@@ -260,12 +293,14 @@ function ModalPopup({ isOpen, isClose }) {
               gap: 2,
             }}
           >
-            <Button
+            <LoadingButton
+              loading={searchLoading}
+              disabled={searchLoading}
               onClick={() => searchPhoneNumber(searchMobile)}
               variant="contained"
             >
               Search
-            </Button>
+            </LoadingButton>
             <Button variant="outlined">Reset</Button>
           </Box>
 
@@ -300,11 +335,32 @@ function ModalPopup({ isOpen, isClose }) {
             ></Box>
             <OutlinedInput
               sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
-              placeholder="Enter AADHHAR"
+              placeholder="Enter AADHAAR"
               value={aadhaarInput}
               onChange={handleAdhaarInput}
-              inputProps={{ maxLength: "12" }}
+              error={!!aadhaarError}
             />
+            {aadhaarError && (
+              <Typography sx={{ fontSize: "0.9rem", color: "red", mt: 1 }}>
+                {aadhaarError}
+              </Typography>
+            )}
+            <Box
+              sx={{
+                display: "inline-flex",
+                justifyContent: "flex-start",
+                alignItems: "center",
+              }}
+            >
+              <Checkbox
+                checked={checked}
+                onChange={handleChange}
+                inputProps={{ "aria-label": "controlled" }}
+              />
+              <Typography variant="h5" sx={{ fontSize: "0.9rem" }}>
+                I Agree
+              </Typography>
+            </Box>
           </Box>
           <Box
             sx={{
@@ -313,6 +369,7 @@ function ModalPopup({ isOpen, isClose }) {
               alignItems: "center",
               mt: 2,
               gap: 2,
+              ml: 18,
             }}
           >
             {aadhaarOtpInput && (
@@ -342,13 +399,13 @@ function ModalPopup({ isOpen, isClose }) {
                     label="Aadhaar OTP"
                     placeholder="Enter Aadhaar otp here"
                     onChange={handleAadhaarOtpVerify}
-                    value={aadhharOtpVerfiy}
+                    value={Number(aadhharOtpVerfiy)}
                   />
                   <LoadingButton
                     variant="contained"
                     disabled={loading}
                     loading={loading}
-                    onClick={() => handleMobile(aadhharOtpVerfiy)}
+                    onClick={() => handleMobile(Number(aadhharOtpVerfiy))}
                   >
                     Verify
                   </LoadingButton>
@@ -367,6 +424,7 @@ function ModalPopup({ isOpen, isClose }) {
                 )}
               </Box>
             )}
+
             {mobileNumber && (
               <Box
                 sx={{
@@ -448,7 +506,7 @@ function ModalPopup({ isOpen, isClose }) {
                     }
                     type="submit"
                   >
-                    Verfiy
+                    Verify
                   </LoadingButton>
                 </Box>
               </Box>
@@ -456,10 +514,10 @@ function ModalPopup({ isOpen, isClose }) {
             {btnShow && (
               <LoadingButton
                 variant="contained"
-                disabled={loading}
+                disabled={!checked || loading}
                 loading={loading}
                 onClick={() => handleSubmit(aadhaarInput)}
-                sx={{ borderRadius: 2, px: 4, py: 1, mx: 32 }}
+                sx={{ borderRadius: 2, px: 4, py: 1, mx: 14 }}
               >
                 Submit
               </LoadingButton>
@@ -470,6 +528,10 @@ function ModalPopup({ isOpen, isClose }) {
       {openDialog && (
         <SuccessDialog isOpen={openDialog} onClose={handleClose} />
       )}
+      {alert && <AadhaarAlert isOpen={alert} onClose={handleAlertClose} />}
+      {aadhaarAlert && <VerifyAadhaarAlert isOpen={aadhaarAlert} />}
+      {mobileAlert && <MobileOtpAlert isOpen={mobileAlert} />}
+      {mobileOtpAlert && <VerifyMobileOtpAlert isOpen={mobileOtpAlert} />}
     </div>
   );
 }

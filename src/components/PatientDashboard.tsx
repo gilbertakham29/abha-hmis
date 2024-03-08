@@ -7,12 +7,9 @@ import {
   FormControl,
   TextField,
   InputLabel,
-  Input,
   Select,
   MenuItem,
-  Menu,
   Button,
-  Grid,
   Typography,
 } from "@mui/material";
 import states from "../../data.json";
@@ -45,7 +42,6 @@ function PatientDashboard() {
     abhaGenerate: false,
     openModal: false,
   };
-  type T = object;
 
   const [state, setState] = useState(initialState);
   const { showForm, abhaGenerate, openModal } = state;
@@ -98,7 +94,7 @@ function PatientDashboard() {
           >
             <InfoIcon />
             <Tab
-              sx={{ fontSize: 18, fontStyle: "bold", fontFamily: "monospace" }}
+              sx={{ fontSize: 14, fontStyle: "bold" }}
               label="Patient Details"
               onClick={patientDetails}
             />
@@ -113,7 +109,7 @@ function PatientDashboard() {
             <FormatListBulletedIcon />
             <Tab
               label="Patient List"
-              sx={{ fontSize: 18, fontStyle: "bold", fontFamily: "monospace" }}
+              sx={{ fontSize: 14, fontStyle: "bold" }}
               onClick={patientList}
             />
           </Box>
