@@ -96,11 +96,6 @@ type Actions =
 
 const rootReducer = (state: State = initialState, action: Actions) => {
   switch (action.type) {
-    case "SET_SEARCH_RESULT":
-      return {
-        ...state,
-        searchResult: action.payload,
-      };
     case "GET_ABHA_CARD_RESULT":
       return {
         ...state,
@@ -155,5 +150,144 @@ const rootReducer = (state: State = initialState, action: Actions) => {
       return state;
   }
 };
-
+export const searchResultReducer = (
+  state = demographicSearchResult,
+  action: ReturnType<typeof setSearchResult>
+) => {
+  switch (action.type) {
+    case "SET_SEARCH_RESULT":
+      return {
+        ...state,
+        searchResult: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const abhaCardResultReducer = (
+  state = abhaCardDataResponse,
+  action: ReturnType<typeof getAbhaCardResult>
+) => {
+  switch (action.type) {
+    case "GET_ABHA_CARD_RESULT":
+      return {
+        state,
+        abhaCardResult: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const abhaQrResultReducer = (
+  state = abhaQrDataResponse,
+  action: ReturnType<typeof getAbhaQrCode>
+) => {
+  switch (action.type) {
+    case "GET_ABHA_QR_CODE":
+      return {
+        state,
+        abhaQrCode: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const abhaInitiationReducer = (
+  state = {},
+  action: ReturnType<typeof abhaRegistration>
+) => {
+  switch (action.type) {
+    case "GET_ABHA_QR_CODE":
+      return {
+        ...state,
+        abhaQrCode: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const adhaarVerificationOtpReducer = (
+  state = {},
+  action: ReturnType<typeof verifyAadhaar>
+) => {
+  switch (action.type) {
+    case "GET_AADHAAR_VERIFICATION_OTP":
+      return {
+        ...state,
+        aadhaarVerification: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const resendAdhaarOtpReducer = (
+  state = {},
+  action: ReturnType<typeof resendAadhaarOtp>
+) => {
+  switch (action.type) {
+    case "GET_AADHAAR_RESEND_OTP":
+      return {
+        ...state,
+        resendAadhaarOtp: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const mobileOtpReducer = (
+  state = {},
+  action: ReturnType<typeof generatePhoneOtp>
+) => {
+  switch (action.type) {
+    case "GET_MOBILE_OTP":
+      return {
+        ...state,
+        mobileOtp: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const createHealtIdReducer = (
+  state = {},
+  action: ReturnType<typeof createHealthIdOtp>
+) => {
+  switch (action.type) {
+    case "CREATE_HEALTH_ID":
+      return {
+        ...state,
+        createHealthIdWithAadhaar: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const getHealthInfoReducer = (
+  state = healthInformationTypeData,
+  action: ReturnType<typeof getHealthInfo>
+) => {
+  switch (action.type) {
+    case "GET_HEALTH_INFO":
+      return {
+        ...state,
+        getHealthInfoData: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+export const getConsentHeaderReducer = (
+  state = initialConsentHeaderData,
+  action: ReturnType<typeof getConsentHeaderList>
+) => {
+  switch (action.type) {
+    case "GET_CONSENT_HEADER":
+      return {
+        state,
+        getConsentHeaderData: action.payload,
+      };
+    default:
+      return state;
+  }
+};
 export default rootReducer;
