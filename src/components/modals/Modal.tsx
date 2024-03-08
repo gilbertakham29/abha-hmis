@@ -43,7 +43,7 @@ const style = {
   py: 2,
   borderColor: "#BDBDBD",
 };
-function ModalPopup({ isOpen, isClose }) {
+function ModalPopup({ isOpen, isClose }: { isOpen: any; isClose: any }) {
   type T = object;
   interface RootState {
     searchResult: Array<T>;
@@ -91,11 +91,14 @@ function ModalPopup({ isOpen, isClose }) {
         getAbhaCard(result.abhaAccountID, dispatch),
         getQrcode(result.abhaAccountID, dispatch),
       ]);
+      console.log(abhaCard, abhaQr);
+
       setOpenModal(isClose);
+      console.log(setError("error"));
     }, 1000);
   };
   useEffect(() => {
-    let timer: string | number;
+    let timer;
     if (countdown > 0) {
       timer = setTimeout(() => {
         setCountdown(countdown - 1);
@@ -116,17 +119,17 @@ function ModalPopup({ isOpen, isClose }) {
     const result = await resendOtp(aadhaarInput, dispatch);
     console.log(result);
   };
-  const handlePhoneSearch = (e) => {
+  const handlePhoneSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchMobile(e.target.value);
   };
-  const handleAadhaarOtpVerify = (e) => {
+  const handleAadhaarOtpVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAadhaarOtpVerify(e.target.value);
   };
-  const handleMobileOtpVerify = (e) => {
-    setMobileOtpVerify(e.target.value);
+  const handleMobileOtpVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMobileOtpVerify(Number(e.target.value));
   };
-  const handleMobileSubmit = (e) => {
-    setMobileInput(e.target.value);
+  const handleMobileSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMobileInput(Number(e.target.value));
   };
 
   const handleSubmit = async (aadhaarInput: string) => {
