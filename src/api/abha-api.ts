@@ -10,6 +10,7 @@ import {
   resendAadhaarOtp,
   getHealthInfo,
   getConsentHeaderList,
+  verifyMobileOtpCreateHealthId,
 } from "../redux/reducer";
 
 import { AppDispatch } from "../redux/store";
@@ -232,7 +233,31 @@ export const createHealthId = async (
   dispatch(createHealthIdOtp(result));
   console.log(result);
 };
-
+export const verifyOtpandCreateHealthId = async (
+  aadhaarInput: string,
+  otp: number,
+  email: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    aadhaar: aadhaarInput,
+    otp: otp,
+    emailId: email,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/VerifyMobileOtpAndGenerateHealthId",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  dispatch(verifyMobileOtpCreateHealthId(result));
+  console.log(result);
+};
 export const initiateConsent = async (
   healthIdInput: string,
   facilityIdInput: string,

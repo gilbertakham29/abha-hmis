@@ -34,6 +34,7 @@ interface State {
   aadhaarVerification: object;
   resendAadhaarOtp: object;
   mobileOtp: object;
+  verifyMobileOtpHealthId: object;
   prescriptions: string | number | object | [];
   getHealthInfoData: HealthInfoData[];
   getConsentHeaderData: ConsentHeaders[];
@@ -56,6 +57,7 @@ const initialState: State = {
   aadhaarVerification: {},
   resendAadhaarOtp: {},
   mobileOtp: {},
+  verifyMobileOtpHealthId: {},
   prescriptions: [],
   getHealthInfoData: [{ healthInformationTypeId: 0, code: "", display: "" }],
   getConsentHeaderData: [
@@ -98,6 +100,9 @@ const rootReducerSlice = createSlice({
     verifyPhoneOtp(state, action: PayloadAction<object>) {
       state.mobileOtp = action.payload;
     },
+    verifyMobileOtpCreateHealthId(state, action: PayloadAction<object>) {
+      state.verifyMobileOtpHealthId = action.payload;
+    },
     createHealthIdOtp(state, action: PayloadAction<object>) {
       state.createHealthIdWithAadhaar = action.payload;
     },
@@ -127,6 +132,7 @@ export const {
   createHealthIdOtp,
   getHealthInfo,
   generatePhoneOtp,
+  verifyMobileOtpCreateHealthId,
   getConsentHeaderList,
   exportPrescriptions,
 } = rootReducerSlice.actions;

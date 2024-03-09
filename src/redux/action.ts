@@ -34,6 +34,10 @@ export const createHealthIdOtp = (result: string) => ({
   type: "CREATE_HEALTH_ID",
   payload: result,
 });
+export const verifyMobiletpWithEmail = (result: object) => ({
+  type: "VERIFY_MOBILE_OTP_AND_CREATE_HEALTH_ID",
+  payload: result,
+});
 export const getHealthInfo = (result: []) => ({
   type: "GET_HEALTH_INFO",
   payload: result,

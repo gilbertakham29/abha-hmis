@@ -17,7 +17,7 @@ import {
   initAbhaRegistration,
   resendOtp,
   verifyAadhaarOtp,
-  verifyMobileOtp,
+  verifyOtpandCreateHealthId,
 } from "../../api/abha-api";
 import CloseIcon from "@mui/icons-material/Close";
 import { LoadingButton } from "@mui/lab";
@@ -70,7 +70,7 @@ function ModalPopup({
   const [aadhaarError, setAadhaarError] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [checked, setChecked] = useState(false);
-
+  const [email, setEmail] = useState("");
   const [resendCount, setResendCount] = useState(0);
   const [showButton, setShowButton] = useState(false);
   const [countdown, setCountdown] = useState(90);
@@ -143,7 +143,9 @@ function ModalPopup({
   const handleMobileSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMobileInput(Number(e.target.value));
   };
-
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
   const handleSubmit = async (aadhaarInput: string) => {
     const aadhaarRegex = /^\d{12}$/; // Simple regex for 12-digit Aadhaar number
     if (!aadhaarRegex.test(aadhaarInput)) {
@@ -210,11 +212,17 @@ function ModalPopup({
   };
   const mobileOtpVerification = async (
     aadhaarInput: string,
-    mobileNumber: number
+    mobileNumber: number,
+    email: string
   ) => {
     setLoading(true);
 
-    const result = await verifyMobileOtp(aadhaarInput, mobileNumber, dispatch);
+    const result = await verifyOtpandCreateHealthId(
+      aadhaarInput,
+      mobileNumber,
+      email,
+      dispatch
+    );
     setTimeout(() => {
       setLoading(false);
       setMobileOtpAlert(true);
@@ -481,19 +489,20 @@ function ModalPopup({
                 sx={{
                   display: "flex",
                   flexDirection: "column",
-                  gap: 2,
-                  justifyContent: "flex-start",
+                  justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 2,
                 }}
               >
-                <Typography>
+                <Typography sx={{ mr: 14 }}>
                   Enter the OTP sent to your mobile and click verify.
                 </Typography>
                 <Box
                   sx={{
-                    display: "inline-flex",
+                    display: "flex",
+                    flexDirection: "row",
                     gap: 2,
-
+                    mr: 14,
                     justifyContent: "flex-start",
                     alignItems: "center",
                   }}
@@ -503,6 +512,12 @@ function ModalPopup({
                     placeholder="Enter Mobile Otp here..."
                     value={mobileOtpVerify}
                     onChange={handleMobileOtpVerify}
+                  />
+                  <TextField
+                    label="Email"
+                    placeholder="Your email here..."
+                    value={email}
+                    onChange={handleEmailChange}
                   />
                   <LoadingButton
                     sx={{
@@ -514,7 +529,11 @@ function ModalPopup({
                     disabled={loading}
                     loading={loading}
                     onClick={() =>
-                      mobileOtpVerification(aadhaarInput, mobileOtpVerify)
+                      mobileOtpVerification(
+                        aadhaarInput,
+                        mobileOtpVerify,
+                        email
+                      )
                     }
                     type="submit"
                   >

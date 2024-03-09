@@ -1,6 +1,20 @@
+import { LoadingButton } from "@mui/lab";
 import { AppBar, Toolbar, Typography } from "@mui/material";
+import React from "react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 function Navbar() {
+  const history = useNavigate();
+  const [loading, setLoading] = React.useState(false);
+  function handleLogout() {
+    setLoading(true);
+
+    setTimeout(() => {
+      history("/"); // Navigate to the next page
+
+      setLoading(false);
+    }, 2000);
+  }
   return (
     <AppBar position="static" color="primary">
       <Toolbar
@@ -32,6 +46,21 @@ function Navbar() {
             CONSENT FORM
           </Typography>
         </Link>
+        <LoadingButton
+          loading={loading}
+          disabled={loading}
+          onClick={handleLogout}
+          sx={{
+            backgroundColor: "#F5F5F5",
+            ":hover": { backgroundColor: "#E0E0E0" },
+            right: 0,
+            fontSize: "0.9rem",
+            mx: 4,
+            position: "fixed",
+          }}
+        >
+          Logout
+        </LoadingButton>
       </Toolbar>
     </AppBar>
   );
