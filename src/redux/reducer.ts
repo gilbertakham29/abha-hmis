@@ -1,17 +1,6 @@
-import {
-  setSearchResult,
-  abhaRegistration,
-  getAbhaCardResult,
-  generatePhoneOtp,
-  getAbhaQrCode,
-  verifyAadhaar,
-  verifyPhoneOtp,
-  createHealthIdOtp,
-  resendAadhaarOtp,
-  getHealthInfo,
-  getConsentHeaderList,
-} from "./action";
-interface ConsentHeaders {
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
+export interface ConsentHeaders {
   abhaConsentHeaderId: string;
   healthId: string;
   consentStatus: string;
@@ -19,13 +8,14 @@ interface ConsentHeaders {
   fetchToDate: string;
   permissionExpiryDate: string;
 }
-interface HealthInfoData {
+
+export interface HealthInfoData {
   healthInformationTypeId: number;
   code: string;
   display: string;
 }
-interface DemographicResult {
-  abhaAccountID: number;
+
+export interface DemographicResult {
   name: string;
   pinCode: string;
   dob: string;
@@ -34,121 +24,111 @@ interface DemographicResult {
   healthIdNumber: string;
   healthId: string;
 }
-type abhaCardData = string;
-type abhaQrData = string;
-const initialConsentHeaderData: ConsentHeaders[] = [
-  {
-    abhaConsentHeaderId: "",
+
+interface State {
+  searchResult: DemographicResult;
+  abhaCardResult: string;
+  abhaQrCode: string;
+  abhaInitiation: object;
+  createHealthIdWithAadhaar: object;
+  aadhaarVerification: object;
+  resendAadhaarOtp: object;
+  mobileOtp: object;
+  prescriptions: string | number | object | [];
+  getHealthInfoData: HealthInfoData[];
+  getConsentHeaderData: ConsentHeaders[];
+}
+
+const initialState: State = {
+  searchResult: {
+    name: "",
+    pinCode: "",
+    dob: "",
+    address: "",
+    mobile: "",
+    healthIdNumber: "",
     healthId: "",
-    consentStatus: "",
-    fetchFromDate: "",
-    fetchToDate: "",
-    permissionExpiryDate: "",
   },
-];
-const healthInformationTypeData: HealthInfoData[] = [
-  {
-    healthInformationTypeId: 1,
-    code: "",
-    display: "",
-  },
-];
-const demographicSearchResult: DemographicResult = {
-  abhaAccountID: 1,
-  name: "",
-  pinCode: "",
-  dob: "",
-  address: "",
-  mobile: "",
-  healthIdNumber: "",
-  healthId: "",
-};
-const abhaCardDataResponse: abhaCardData = "";
-const abhaQrDataResponse: abhaQrData = "";
-const initialState = {
-  searchResult: demographicSearchResult,
-  abhaCardResult: abhaCardDataResponse,
-  abhaQrCode: abhaQrDataResponse,
+  abhaCardResult: "",
+  abhaQrCode: "",
   abhaInitiation: {},
-  createHealthIdWithAadhaar: {}, // corrected typo in variable name
+  createHealthIdWithAadhaar: {},
   aadhaarVerification: {},
   resendAadhaarOtp: {},
   mobileOtp: {},
   prescriptions: [],
-  getHealthInfoData: healthInformationTypeData,
-  getConsentHeaderData: initialConsentHeaderData,
+  getHealthInfoData: [{ healthInformationTypeId: 0, code: "", display: "" }],
+  getConsentHeaderData: [
+    {
+      abhaConsentHeaderId: "",
+      healthId: "",
+      consentStatus: "",
+      fetchFromDate: "",
+      fetchToDate: "",
+      permissionExpiryDate: "",
+    },
+  ],
 };
 
-type State = typeof initialState;
+const rootReducerSlice = createSlice({
+  name: "rootReducer",
+  initialState,
+  reducers: {
+    setSearchResult(state, action: PayloadAction<DemographicResult>) {
+      state.searchResult = action.payload;
+    },
+    getAbhaCardResult(state, action: PayloadAction<string>) {
+      state.abhaCardResult = action.payload;
+    },
+    generatePhoneOtp(state, action: PayloadAction<object>) {
+      state.mobileOtp = action.payload;
+    },
+    getAbhaQrCode(state, action: PayloadAction<string>) {
+      state.abhaQrCode = action.payload;
+    },
+    abhaRegistration(state, action: PayloadAction<object>) {
+      state.abhaInitiation = action.payload;
+    },
+    verifyAadhaar(state, action: PayloadAction<object>) {
+      state.aadhaarVerification = action.payload;
+    },
+    resendAadhaarOtp(state, action: PayloadAction<object>) {
+      state.resendAadhaarOtp = action.payload;
+    },
+    verifyPhoneOtp(state, action: PayloadAction<object>) {
+      state.mobileOtp = action.payload;
+    },
+    createHealthIdOtp(state, action: PayloadAction<object>) {
+      state.createHealthIdWithAadhaar = action.payload;
+    },
+    getHealthInfo(state, action: PayloadAction<Array<HealthInfoData>>) {
+      state.getHealthInfoData = action.payload;
+    },
+    getConsentHeaderList(state, action: PayloadAction<Array<ConsentHeaders>>) {
+      state.getConsentHeaderData = action.payload;
+    },
+    exportPrescriptions(
+      state,
+      action: PayloadAction<string | number | object | []>
+    ) {
+      state.prescriptions = action.payload;
+    },
+  },
+});
 
-type Actions =
-  | ReturnType<typeof setSearchResult>
-  | ReturnType<typeof abhaRegistration>
-  | ReturnType<typeof getAbhaCardResult>
-  | ReturnType<typeof generatePhoneOtp>
-  | ReturnType<typeof getAbhaQrCode>
-  | ReturnType<typeof verifyAadhaar>
-  | ReturnType<typeof resendAadhaarOtp>
-  | ReturnType<typeof verifyPhoneOtp>
-  | ReturnType<typeof createHealthIdOtp>
-  | ReturnType<typeof getHealthInfo>
-  | ReturnType<typeof getConsentHeaderList>;
+export const {
+  setSearchResult,
+  getAbhaCardResult,
+  getAbhaQrCode,
+  abhaRegistration,
+  verifyAadhaar,
+  resendAadhaarOtp,
+  verifyPhoneOtp,
+  createHealthIdOtp,
+  getHealthInfo,
+  generatePhoneOtp,
+  getConsentHeaderList,
+  exportPrescriptions,
+} = rootReducerSlice.actions;
 
-const rootReducer = (state: State = initialState, action: Actions) => {
-  switch (action.type) {
-    case "GET_ABHA_CARD_RESULT":
-      return {
-        ...state,
-        abhaCardResult: action.payload,
-      };
-    case "GET_ABHA_QR_CODE":
-      return {
-        ...state,
-        abhaQrCode: action.payload,
-      };
-    case "ABHA_REGISTRATION": // corrected action type
-      return {
-        ...state,
-        abhaInitiation: action.payload,
-      };
-    case "GET_AADHAAR_VERIFICATION_OTP":
-      return {
-        ...state,
-        aadhaarVerification: action.payload,
-      };
-    case "GET_AADHAAR_RESEND_OTP":
-      return {
-        ...state,
-        resendAadhaarOtp: action.payload,
-      };
-    case "GET_MOBILE_OTP":
-      return {
-        ...state,
-        mobileOtp: action.payload,
-      };
-    case "CREATE_HEALTH_ID":
-      return {
-        ...state,
-        createHealthIdWithAadhaar: action.payload,
-      };
-    case "EXPORT_PRESCRIPTIONS":
-      return {
-        ...state,
-        prescriptions: action.payload,
-      };
-    case "GET_HEALTH_INFO":
-      return {
-        ...state,
-        getHealthInfoData: action.payload,
-      };
-    case "GET_CONSENT_HEADER":
-      return {
-        state,
-        getConsentHeaderData: action.payload,
-      };
-    default:
-      return state;
-  }
-};
-
-export default rootReducer;
+export default rootReducerSlice.reducer;

@@ -16,6 +16,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { getConsentHeaders } from "../api/abha-api";
 import { useDispatch, useSelector } from "react-redux";
+import { ConsentHeaders } from "../redux/reducer";
 interface Column {
   id:
     | "patientIdentifier"
@@ -58,32 +59,28 @@ const columns: Column[] = [
 
     format: (value: number) => value.toFixed(2),
   },
+  {
+    id: "view",
+    label: "View",
+    minWidth: 100,
+
+    format: (value: number) => value.toFixed(2),
+  },
 ];
 
 //interface RootState {
 //getConsentHeaderData: Array<T>;
 //}
-type ConsentHeader = [
-  {
-    abhaConsentHeaderId: string;
-    healthId: string;
-    consentStatus: string;
-    fetchFromDate: string;
-    fetchToDate: string;
-    permissionExpiryDate: string;
-    // Add more properties if needed
-  }
-];
 
-type RootState = {
-  getConsentHeaderData: ConsentHeader;
-};
 export default function ConsentTable() {
   const initialState = {
     dateFrom: null,
     dateTo: null,
   };
 
+  type RootState = {
+    getConsentHeaderData: ConsentHeaders[];
+  };
   const consentHeaderList = useSelector(
     (state: RootState) => state.getConsentHeaderData
   );
@@ -96,7 +93,7 @@ export default function ConsentTable() {
   const { dateFrom, dateTo } = state;
   const dispatch = useDispatch();
   const handleConsentSearch = async (fromDate: null, toDate: null) => {
-    setProgress(true);
+    setProgress(false);
     setTimeout(() => {
       setProgress(false);
     }, 2000);
@@ -217,26 +214,16 @@ export default function ConsentTable() {
                     {column.label}
                   </TableCell>
                 ))}
-                <TableCell
-                  sx={{
-                    backgroundColor: "#00E676",
-                    color: "#fff",
-                    position: "sticky",
-                    top: 57,
-                  }}
-                >
-                  View
-                </TableCell>
               </TableRow>
             </TableHead>
 
-            {!progress && (
-              <TableBody>
-                {consentHeaderList
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((consent) => {
-                    return (
-                      <>
+            {consentHeaderList
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((consent) => {
+                return (
+                  <>
+                    {!progress && (
+                      <TableBody>
                         <TableRow
                           hover
                           role="checkbox"
@@ -246,12 +233,15 @@ export default function ConsentTable() {
                           <TableCell align="center">
                             {consent.healthId}
                           </TableCell>
+
                           <TableCell align="center">
                             {consent.consentStatus}
                           </TableCell>
+
                           <TableCell align="center">
                             {consent.fetchFromDate}
                           </TableCell>
+
                           <TableCell align="center">
                             {consent.fetchToDate}
                           </TableCell>
@@ -259,9 +249,16 @@ export default function ConsentTable() {
                           <TableCell align="center">
                             {consent.permissionExpiryDate}
                           </TableCell>
-                          <TableCell>
+
+                          <TableCell align="center">
                             <Link to="/viewlist">
-                              <IconButton>
+                              <IconButton
+                                sx={{
+                                  contentVisibility: progress
+                                    ? "hidden"
+                                    : "visibility",
+                                }}
+                              >
                                 <ArrowForwardIosIcon
                                   sx={{ color: "#00E676" }}
                                 />
@@ -269,16 +266,16 @@ export default function ConsentTable() {
                             </Link>
                           </TableCell>
                         </TableRow>
-                      </>
-                    );
-                  })}
-              </TableBody>
-            )}
+                      </TableBody>
+                    )}
+                  </>
+                );
+              })}
           </Table>
         </TableContainer>
 
         <TablePagination
-          rowsPerPageOptions={[5, 25, 100]}
+          rowsPerPageOptions={[10, 25, 100]}
           count={consentHeaderList.length}
           rowsPerPage={rowsPerPage}
           page={page}

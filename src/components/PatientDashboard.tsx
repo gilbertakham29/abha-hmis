@@ -22,19 +22,7 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ModalPopup from "./modals/Modal";
 import { useSelector } from "react-redux";
 import PatientList from "./PatientList";
-function calculateAge(dateOfBirth: number) {
-  const today = new Date();
-  const birthDate = new Date(dateOfBirth);
-  let age = today.getFullYear() - birthDate.getFullYear();
-  const monthDiff = today.getMonth() - birthDate.getMonth();
-  if (
-    monthDiff < 0 ||
-    (monthDiff === 0 && today.getDate() < birthDate.getDate())
-  ) {
-    age--;
-  }
-  return age;
-}
+
 function PatientDashboard() {
   const initialState = {
     showForm: true,
@@ -42,7 +30,6 @@ function PatientDashboard() {
     openModal: false,
   };
   type getDemographicsResult = {
-    abhaAccountID: number;
     name: string;
     pinCode: string;
     dob: string;
@@ -51,29 +38,29 @@ function PatientDashboard() {
     healthIdNumber: string;
     healthId: string;
   };
-  type abhaCardResponse = string;
-  type abhaQrResponse = string;
+
   type RootState = {
     searchResult: getDemographicsResult;
+    abhaCardResult: object;
+    abhaQrCode: object;
   };
-  type abhaCardState = {
-    abhaCardResult: abhaCardResponse;
-  };
-  type abhaQrState = {
-    abhaQrCode: abhaQrResponse;
-  };
+
   const [state, setState] = useState(initialState);
   const { showForm, openModal } = state;
-  const searchResult = useSelector((state: RootState) => state.searchResult);
+
+  // Use useSelector to select the searchResult from the Redux store
+  const searchResultData = useSelector(
+    (state: RootState) => state.searchResult
+  );
+  console.log(searchResultData);
+
   const abhaCardResult = useSelector(
-    (state: abhaCardState) => state.abhaCardResult
+    (state: RootState) => state.abhaCardResult
   );
-  const abhaQrCodeResult = useSelector(
-    (state: abhaQrState) => state.abhaQrCode
-  );
-  console.log(searchResult);
-  const age = calculateAge(Number(searchResult.dob));
-  console.log(age);
+  const abhaQrCodeResult = useSelector((state: RootState) => state.abhaQrCode);
+  console.log(searchResultData);
+  //const age = calculateAge(Number(searchResult.dob));
+  //console.log(age);
 
   const patientDetails = () => {
     setState({
@@ -174,9 +161,9 @@ function PatientDashboard() {
                 label="Title"
               />
               <TextField
-                value={searchResult.name}
+                value={searchResultData.name}
                 InputLabelProps={{
-                  shrink: searchResult.name !== "", // shrink label if value is not empty
+                  shrink: searchResultData.name !== "", // shrink label if value is not empty
                 }}
                 variant="outlined"
                 required
@@ -185,9 +172,9 @@ function PatientDashboard() {
               />
               <TextField
                 variant="outlined"
-                value={searchResult.pinCode}
+                value={searchResultData.pinCode}
                 InputLabelProps={{
-                  shrink: searchResult.pinCode !== "", // shrink label if value is not empty
+                  shrink: searchResultData.pinCode !== "", // shrink label if value is not empty
                 }}
                 required
                 id="outlined-required"
@@ -207,9 +194,9 @@ function PatientDashboard() {
               <TextField
                 type="datetime-local"
                 variant="outlined"
-                value={searchResult.dob}
+                value={searchResultData.dob}
                 InputLabelProps={{
-                  shrink: searchResult.dob !== "", // shrink label if value is not empty
+                  shrink: searchResultData.dob !== "", // shrink label if value is not empty
                 }}
                 required
                 placeholder="Date of Birth"
@@ -220,7 +207,7 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={searchResult.dob && age + " years"}
+                value={searchResultData.dob + " years"}
                 id="outlined-required"
                 placeholder="Age"
                 sx={{ width: "30%" }}
@@ -228,9 +215,9 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={searchResult.address}
+                value={searchResultData.address}
                 InputLabelProps={{
-                  shrink: searchResult.address !== "", // shrink label if value is not empty
+                  shrink: searchResultData.address !== "", // shrink label if value is not empty
                 }}
                 id="outlined-required"
                 placeholder="Permanent Address"
@@ -288,9 +275,9 @@ function PatientDashboard() {
             >
               <TextField
                 variant="outlined"
-                value={searchResult.mobile}
+                value={searchResultData.mobile}
                 InputLabelProps={{
-                  shrink: searchResult.mobile !== "", // shrink label if value is not empty
+                  shrink: searchResultData.mobile !== "", // shrink label if value is not empty
                 }}
                 placeholder="Contact No."
                 sx={{ width: "30%" }}
@@ -397,12 +384,14 @@ function PatientDashboard() {
               >
                 Get ABHA
               </Button>
-              {searchResult.healthIdNumber && (
+              {searchResultData.healthIdNumber && (
                 <Box sx={{ mt: 1 }}>
                   <Typography>
-                    ABHA ID: {searchResult.healthIdNumber}
+                    ABHA ID: {searchResultData.healthIdNumber}
                   </Typography>
-                  <Typography>ABHA Address: {searchResult.healthId}</Typography>
+                  <Typography>
+                    ABHA Address: {searchResultData.healthId}
+                  </Typography>
                 </Box>
               )}
             </Box>
@@ -412,7 +401,7 @@ function PatientDashboard() {
             </Button>
           </FormControl>
 
-          {abhaCardResult && (
+          {searchResultData.healthId && (
             <Box
               sx={{
                 display: "flex",

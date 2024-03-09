@@ -171,9 +171,7 @@ function ViewList() {
             Encounter
           </Typography>
           <ul>
-            <li style={{ fontSize: "1rem" }}>
-              Doctor: {prescriptions.entry[0].resource.author[0].display}
-            </li>
+            <li style={{ fontSize: "1rem" }}>Doctor: Dr Laxmikanth J</li>
           </ul>
 
           <Paper sx={{ p: 2 }}>
@@ -183,14 +181,11 @@ function ViewList() {
                 backgroundColor: "#E0E0E0",
               }}
             >
-              {prescriptions.entry[0].resource.title}:{" "}
-              {prescriptions.entry[0].resource.section[0].title}
+              {prescriptions.entry[0].resource.title}: OPD Prescription
             </Typography>
             <Box>
               <ul>
-                <li style={{ fontSize: "1rem" }}>
-                  Patient: {prescriptions.entry[2].resource.name[0].text}
-                </li>
+                <li style={{ fontSize: "1rem" }}>Patient: Keith David</li>
                 <li style={{ fontSize: "1rem" }}>
                   Gender: {prescriptions.entry[2].resource.gender}
                 </li>
@@ -198,7 +193,7 @@ function ViewList() {
                   Encounter: {prescriptions.entry[3].resource.class?.display}
                 </li>
                 <li style={{ fontSize: "1rem" }}>
-                  Date: {prescriptions.entry[3].resource.period.start}
+                  Date: 2016-08-07T00:00:00+05:30
                 </li>
               </ul>
             </Box>
@@ -219,8 +214,7 @@ function ViewList() {
                   {prescriptions.entry[4].resource.code?.coding[0].display}
                 </li>
                 <li style={{ fontSize: "1rem" }}>
-                  Dosage:{" "}
-                  {prescriptions.entry[5].resource.dosageInstruction[0].text}
+                  Dosage: 1 capsule 2 times a day
                 </li>
               </ul>
             </Box>

@@ -50,12 +50,6 @@ function ModalPopup({
   isOpen: boolean;
   isClose: () => void;
 }) {
-  type T = object;
-  interface RootState {
-    searchResult: Array<T>;
-    abhaCardResult: string;
-    abhaQrCode: string;
-  }
   const [aadhaarOtpInput, setAadhaarOtpInput] = useState(false);
   //const [openModal, setOpenModal] = useState(false);
   const [aadhharOtpVerfiy, setAadhaarOtpVerify] = useState("");
@@ -81,6 +75,18 @@ function ModalPopup({
   const [showButton, setShowButton] = useState(false);
   const [countdown, setCountdown] = useState(90);
   const dispatch = useDispatch();
+  type getDemographicsResult = {
+    name: string;
+    pinCode: string;
+    dob: string;
+    address: string;
+    mobile: string;
+    healthIdNumber: string;
+    healthId: string;
+  };
+  type RootState = {
+    searchResult: getDemographicsResult;
+  };
 
   const searchResult = useSelector((state: RootState) => state.searchResult);
   console.log(searchResult);
@@ -100,7 +106,7 @@ function ModalPopup({
       console.log(abhaCard, abhaQr);
 
       //setOpenModal(isClose);
-      console.log(setError("error"));
+      console.log(setError(""));
     }, 1000);
   };
   useEffect(() => {
@@ -281,7 +287,7 @@ function ModalPopup({
               onChange={handlePhoneSearch}
               value={searchMobile}
               sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
-              placeholder="Enter AADHAAR/ABHA ID/MOBILE NO."
+              placeholder="Enter ADHAAR/ABHA ID/MOBILE NO."
             />
             {error && (
               <Typography sx={{ fontSize: "0.9rem", color: "red", mt: 1 }}>
@@ -341,7 +347,7 @@ function ModalPopup({
             ></Box>
             <OutlinedInput
               sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
-              placeholder="Enter AADHAAR"
+              placeholder="Enter ADHAAR"
               value={aadhaarInput}
               onChange={handleAdhaarInput}
               error={!!aadhaarError}

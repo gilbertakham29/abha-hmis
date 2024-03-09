@@ -18,6 +18,7 @@ import { getHealthInformationType, initiateConsent } from "../../api/abha-api";
 import { LoadingButton } from "@mui/lab";
 import CloseIcon from "@mui/icons-material/Close";
 import ConsentAlert from "../alerts/consetAlert";
+import { HealthInfoData } from "../../redux/reducer";
 const style = {
   position: "absolute",
   left: 0,
@@ -40,28 +41,20 @@ function ConsentModal({
   isOpen: boolean;
   isClose: () => void;
 }) {
-  type HealthInformationData = [
-    {
-      healthInformationTypeId: number;
-      code: string;
-      display: string;
-      // Add more properties if needed
-    }
-  ];
-
-  type RootState = {
-    getHealthInfoData: HealthInformationData;
-  };
   //const dateString = new Date();
   //const date: Date = dateString;
 
   const tomorrow = new Date();
+
+  type RootState = {
+    getHealthInfoData: HealthInfoData[];
+  };
+  const healthInfo = useSelector((state: RootState) => state.getHealthInfoData);
   const [selectedValues, setSelectedValues] = useState({ hiTypesList: [""] });
   const [healthIdValue, setHealthIdValue] = useState("");
   const [loading, setLoading] = useState(false);
   const [consentAlert, setConsentAlert] = useState(false);
   const dispatch = useDispatch();
-  const healthInfo = useSelector((state: RootState) => state.getHealthInfoData);
   const handleCheckboxChange = (value: string) => {
     setSelectedValues((prevState) => {
       if (prevState.hiTypesList.includes(value)) {

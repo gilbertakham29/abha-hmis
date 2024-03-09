@@ -10,9 +10,13 @@ import {
   resendAadhaarOtp,
   getHealthInfo,
   getConsentHeaderList,
-} from "../redux/action";
-import { Dispatch } from "redux";
-export const handleSearch = async (phoneNumber: string, dispatch: Dispatch) => {
+} from "../redux/reducer";
+
+import { AppDispatch } from "../redux/store";
+export const handleSearch = async (
+  phoneNumber: string,
+  dispatch: AppDispatch
+) => {
   const data = {
     searchString: phoneNumber,
   };
@@ -31,6 +35,8 @@ export const handleSearch = async (phoneNumber: string, dispatch: Dispatch) => {
     const result = await response.json();
 
     dispatch(setSearchResult(result));
+    console.log(result);
+
     return result;
   } catch (error) {
     console.error("Error fetching patient details:", error);
@@ -38,7 +44,7 @@ export const handleSearch = async (phoneNumber: string, dispatch: Dispatch) => {
 };
 export const getAbhaCard = async (
   abhaAccountID: number,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     id: abhaAccountID,
@@ -63,7 +69,10 @@ export const getAbhaCard = async (
     console.error("Error fetching card details:", error);
   }
 };
-export const getQrcode = async (abhaAccountID: number, dispatch: Dispatch) => {
+export const getQrcode = async (
+  abhaAccountID: number,
+  dispatch: AppDispatch
+) => {
   const data = {
     id: abhaAccountID,
   };
@@ -87,7 +96,7 @@ export const getQrcode = async (abhaAccountID: number, dispatch: Dispatch) => {
 };
 export const initAbhaRegistration = async (
   aadhaarInput: string,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
@@ -113,7 +122,7 @@ export const initAbhaRegistration = async (
 export const verifyAadhaarOtp = async (
   aadhaarInput: string,
   otp: number,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
@@ -136,7 +145,7 @@ export const verifyAadhaarOtp = async (
 export const generateMobileOtp = async (
   aadhaarInput: string,
   phoneNumber: number,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
@@ -159,7 +168,7 @@ export const generateMobileOtp = async (
 export const verifyMobileOtp = async (
   aadhaarInput: string,
   otp: number,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
@@ -179,7 +188,10 @@ export const verifyMobileOtp = async (
   dispatch(verifyPhoneOtp(result));
   console.log(result);
 };
-export const resendOtp = async (aadhaarInput: string, dispatch: Dispatch) => {
+export const resendOtp = async (
+  aadhaarInput: string,
+  dispatch: AppDispatch
+) => {
   const data = {
     aadhaar: aadhaarInput,
   };
@@ -200,7 +212,7 @@ export const resendOtp = async (aadhaarInput: string, dispatch: Dispatch) => {
 export const createHealthId = async (
   aadhaarInput: string,
   otp: number,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
@@ -256,7 +268,7 @@ export const initiateConsent = async (
   const result = await response.json();
   console.log(result);
 };
-export const getHealthInformationType = async (dispatch: Dispatch) => {
+export const getHealthInformationType = async (dispatch: AppDispatch) => {
   const response = await fetch(
     "https://dev-care-connect-api.azurewebsites.net/api/AbhaBase/GetHealthInformationType",
     {
@@ -272,7 +284,7 @@ export const getConsentHeaders = async (
   facilityInput: string,
   fromDateInput: string | null,
   toDateInput: string | null,
-  dispatch: Dispatch
+  dispatch: AppDispatch
 ) => {
   const data = {
     facilityId: facilityInput,
