@@ -9,7 +9,7 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import { Link } from "react-router-dom";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box, CircularProgress, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -93,10 +93,7 @@ export default function ConsentTable() {
   const { dateFrom, dateTo } = state;
   const dispatch = useDispatch();
   const handleConsentSearch = async (fromDate: null, toDate: null) => {
-    setProgress(false);
-    setTimeout(() => {
-      setProgress(false);
-    }, 2000);
+    setProgress(true);
     const result = await getConsentHeaders(
       "IN1410000152",
       fromDate,
@@ -222,7 +219,7 @@ export default function ConsentTable() {
               .map((consent) => {
                 return (
                   <>
-                    {!progress && (
+                    {progress && (
                       <TableBody>
                         <TableRow
                           hover
@@ -252,13 +249,7 @@ export default function ConsentTable() {
 
                           <TableCell align="center">
                             <Link to="/viewlist">
-                              <IconButton
-                                sx={{
-                                  contentVisibility: progress
-                                    ? "hidden"
-                                    : "visibility",
-                                }}
-                              >
+                              <IconButton>
                                 <ArrowForwardIosIcon
                                   sx={{ color: "#00E676" }}
                                 />
@@ -283,7 +274,7 @@ export default function ConsentTable() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <>{progress && <CircularProgress color="success" />}</>
+      <></>
     </>
   );
 }

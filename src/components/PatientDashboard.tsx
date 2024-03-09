@@ -24,6 +24,20 @@ import { useSelector } from "react-redux";
 import PatientList from "./PatientList";
 
 function PatientDashboard() {
+  function calculateAge(dateOfBirth: string) {
+    const today = new Date();
+    const birthDate = new Date(dateOfBirth);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age;
+  }
+
   const initialState = {
     showForm: true,
     abhaGenerate: false,
@@ -59,6 +73,7 @@ function PatientDashboard() {
   );
   const abhaQrCodeResult = useSelector((state: RootState) => state.abhaQrCode);
   console.log(searchResultData);
+  const age = calculateAge(searchResultData.dob);
   //const age = calculateAge(Number(searchResult.dob));
   //console.log(age);
 
@@ -194,10 +209,7 @@ function PatientDashboard() {
               <TextField
                 type="datetime-local"
                 variant="outlined"
-                value={searchResultData.dob}
-                InputLabelProps={{
-                  shrink: searchResultData.dob !== "", // shrink label if value is not empty
-                }}
+                value={searchResultData.dob && age + "years"}
                 required
                 placeholder="Date of Birth"
                 id="outlined-required"
