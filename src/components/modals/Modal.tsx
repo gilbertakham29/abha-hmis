@@ -53,10 +53,10 @@ function ModalPopup({
   const [aadhaarOtpInput, setAadhaarOtpInput] = useState(false);
   //const [openModal, setOpenModal] = useState(false);
   const [aadhharOtpVerfiy, setAadhaarOtpVerify] = useState("");
-  const [mobileInput, setMobileInput] = useState(0);
+  const [mobileInput, setMobileInput] = useState("");
   const [mobileNumber, setMobileNumber] = useState(false);
   const [mobileOtp, setMobileOtp] = useState(false);
-  const [mobileOtpVerify, setMobileOtpVerify] = useState(0);
+  const [mobileOtpVerify, setMobileOtpVerify] = useState("");
   const [aadhaarInput, setAadhaarInput] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
   const [btnShow, setBtnShow] = useState(true);
@@ -135,13 +135,22 @@ function ModalPopup({
     setSearchMobile(e.target.value);
   };
   const handleAadhaarOtpVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAadhaarOtpVerify(e.target.value);
+    const newValue: string = e.target.value;
+    if (!isNaN(Number(newValue))) {
+      setAadhaarOtpVerify(newValue);
+    }
   };
   const handleMobileOtpVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMobileOtpVerify(Number(e.target.value));
+    const newValue: string = e.target.value;
+    if (!isNaN(Number(newValue))) {
+      setMobileOtpVerify(newValue);
+    }
   };
   const handleMobileSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setMobileInput(Number(e.target.value));
+    const newValue: string = e.target.value;
+    if (!isNaN(Number(newValue))) {
+      setMobileInput(newValue);
+    }
   };
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -419,7 +428,7 @@ function ModalPopup({
                     label="Aadhaar OTP"
                     placeholder="Enter Aadhaar otp here"
                     onChange={handleAadhaarOtpVerify}
-                    value={Number(aadhharOtpVerfiy)}
+                    value={aadhharOtpVerfiy}
                   />
                   <LoadingButton
                     variant="contained"
@@ -473,7 +482,7 @@ function ModalPopup({
                   />
                   <LoadingButton
                     onClick={() =>
-                      handleMobileOtpGenerate(aadhaarInput, mobileInput)
+                      handleMobileOtpGenerate(aadhaarInput, Number(mobileInput))
                     }
                     variant="contained"
                     disabled={loading}
@@ -531,7 +540,7 @@ function ModalPopup({
                     onClick={() =>
                       mobileOtpVerification(
                         aadhaarInput,
-                        mobileOtpVerify,
+                        Number(mobileOtpVerify),
                         email
                       )
                     }

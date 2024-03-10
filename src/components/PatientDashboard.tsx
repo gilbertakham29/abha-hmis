@@ -24,17 +24,24 @@ import { useSelector } from "react-redux";
 import PatientList from "./PatientList";
 
 function PatientDashboard() {
-  function calculateAge(dateOfBirth: string) {
+  function calculateAge(dateString: string) {
+    // Parse the date string to a Date object
+    const dob = new Date(dateString);
+
+    // Get today's date
     const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    // Calculate the difference in years
+    let age = today.getFullYear() - dob.getFullYear();
+
+    // Check if the birthday has occurred this year already
     if (
-      monthDiff < 0 ||
-      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      today.getMonth() < dob.getMonth() ||
+      (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())
     ) {
       age--;
     }
+
     return age;
   }
 
@@ -209,7 +216,7 @@ function PatientDashboard() {
               <TextField
                 type="datetime-local"
                 variant="outlined"
-                value={searchResultData.dob && age + "years"}
+                value={searchResultData.dob}
                 required
                 placeholder="Date of Birth"
                 id="outlined-required"
@@ -219,7 +226,7 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={searchResultData.dob + " years"}
+                value={age + " years"}
                 id="outlined-required"
                 placeholder="Age"
                 sx={{ width: "30%" }}

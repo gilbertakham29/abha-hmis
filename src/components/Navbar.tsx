@@ -10,7 +10,9 @@ function Navbar() {
     setLoading(true);
 
     setTimeout(() => {
-      history("/"); // Navigate to the next page
+      // Navigate to the next page
+      history("/");
+      location.reload();
 
       setLoading(false);
     }, 2000);
