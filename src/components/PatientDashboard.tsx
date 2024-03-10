@@ -226,7 +226,7 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={age + " years"}
+                value={age ? age + " years" : "age"}
                 id="outlined-required"
                 placeholder="Age"
                 sx={{ width: "30%" }}
