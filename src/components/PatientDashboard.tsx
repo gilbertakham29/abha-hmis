@@ -369,9 +369,7 @@ function PatientDashboard() {
                   id="demo-simple-select"
                   label="Relationships"
                   value={
-                    searchResultData.stateName
-                      ? searchResultData.stateName
-                      : "State"
+                    searchResultData.stateName ? searchResultData.stateName : ""
                   }
                 >
                   {searchResultData.stateName}
