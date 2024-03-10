@@ -54,6 +54,8 @@ function PatientDashboard() {
     name: string;
     pinCode: string;
     dob: string;
+    gender: string;
+    stateName: string;
     address: string;
     mobile: string;
     healthIdNumber: string;
@@ -260,10 +262,20 @@ function PatientDashboard() {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Age"
+                  value={searchResultData.gender ? searchResultData.gender : ""}
                 >
-                  <MenuItem value="Male">Male</MenuItem>
-                  <MenuItem value="Female">Female</MenuItem>
-                  <MenuItem value="Transgender">Transgender</MenuItem>
+                  {searchResultData.gender}
+                  {searchResultData.gender ? (
+                    <MenuItem value={searchResultData.gender}>
+                      {searchResultData.gender}
+                    </MenuItem>
+                  ) : (
+                    <>
+                      <MenuItem value="Male">Male</MenuItem>
+                      <MenuItem value="Female">Female</MenuItem>
+                      <MenuItem value="Transgender">Transgender</MenuItem>
+                    </>
+                  )}
                 </Select>
               </FormControl>
               <FormControl sx={{ width: "30%" }}>
@@ -356,13 +368,27 @@ function PatientDashboard() {
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
                   label="Relationships"
+                  value={
+                    searchResultData.stateName
+                      ? searchResultData.stateName
+                      : "State"
+                  }
                 >
-                  {states.state.map((stateName, item) => (
-                    <MenuItem value={stateName.name} key={item}>
-                      {" "}
-                      {stateName.name}
+                  {searchResultData.stateName}
+                  {searchResultData.stateName ? (
+                    <MenuItem value={searchResultData.stateName}>
+                      {searchResultData.stateName}
                     </MenuItem>
-                  ))}
+                  ) : (
+                    <>
+                      {states.state.map((stateName, item) => (
+                        <MenuItem value={stateName.name} key={item}>
+                          {" "}
+                          {stateName.name}
+                        </MenuItem>
+                      ))}
+                    </>
+                  )}
                 </Select>
               </FormControl>
               <FormControl sx={{ width: "30%" }}>
