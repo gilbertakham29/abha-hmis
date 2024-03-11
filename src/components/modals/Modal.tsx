@@ -104,7 +104,7 @@ function ModalPopup({
         getQrcode(result.abhaAccountID, dispatch),
       ]);
       console.log(abhaCard, abhaQr);
-
+      isClose();
       //setOpenModal(isClose);
       console.log(setError(""));
     }, 1000);
@@ -164,25 +164,27 @@ function ModalPopup({
       setAadhaarOtpInput(false);
     } else {
       // Handle submission or further processing
+      setLoading(true);
       setAadhaarError("");
+      setBtnShow(false);
+      setAadhaarOtpInput(true);
+      setLoading(false);
+
+      // Simulating an asynchronous operation
+      const result = await initAbhaRegistration(aadhaarInput, dispatch);
+      console.log(result);
+      setTimeout(() => {
+        setLoading(false);
+
+        setAlert(true);
+
+        setBtnShow(false);
+        setTimeout(() => {
+          setAlert(false);
+        }, 3000);
+      }, 2000);
       // Reset the input field
     }
-    const result = await initAbhaRegistration(aadhaarInput, dispatch);
-    console.log(result);
-
-    setLoading(true);
-    // Simulating an asynchronous operation
-
-    setTimeout(() => {
-      setLoading(false);
-      setAadhaarOtpInput(true);
-      setAlert(true);
-
-      setBtnShow(false);
-      setTimeout(() => {
-        setAlert(false);
-      }, 3000);
-    }, 2000);
   };
 
   const handleMobile = async (aadhharOtp: number) => {
@@ -513,7 +515,7 @@ function ModalPopup({
                     gap: 2,
                     mr: 14,
                     justifyContent: "flex-start",
-                    alignItems: "center",
+                    alignItems: "flex-start",
                   }}
                 >
                   <TextField
@@ -522,14 +524,27 @@ function ModalPopup({
                     value={mobileOtpVerify}
                     onChange={handleMobileOtpVerify}
                   />
-                  <TextField
-                    label="Email"
-                    placeholder="Your email here..."
-                    value={email}
-                    onChange={handleEmailChange}
-                  />
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      alignItems: "center",
+                      gap: 1,
+                    }}
+                  >
+                    <TextField
+                      label="Email"
+                      value={email}
+                      onChange={handleEmailChange}
+                    />
+                    <Typography sx={{ fontSize: "0.7rem", color: "red" }}>
+                      This will be ABHA address
+                    </Typography>
+                  </Box>
                   <LoadingButton
                     sx={{
+                      my: 1,
                       backgroundColor: "#00E676",
                       ":hover": { backgroundColor: "#00C853" },
                     }}

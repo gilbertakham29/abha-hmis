@@ -218,7 +218,7 @@ function PatientDashboard() {
               <TextField
                 type="datetime-local"
                 variant="outlined"
-                value={searchResultData.dob}
+                value={searchResultData.dob ? searchResultData.dob : null}
                 required
                 placeholder="Date of Birth"
                 id="outlined-required"
