@@ -17,7 +17,8 @@ import { useState } from "react";
 const Background = styled("div")({
   width: "100%",
   height: "100vh",
-  backgroundImage: "url('../src/assets/images/hospital.jpg')",
+  backgroundImage:
+    "url('https://img.freepik.com/free-vector/clean-medical-background_53876-97927.jpg?w=740&t=st=1710146750~exp=1710147350~hmac=61eb7dde8b77e3b5014d0119aea5039f9cb5c9b1a2b2462522d802d592a8066f')",
   backgroundPosition: "center",
   backgroundSize: "cover",
   overflowX: "hidden",
