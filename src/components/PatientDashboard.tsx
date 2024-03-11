@@ -444,7 +444,7 @@ function PatientDashboard() {
             </Button>
           </FormControl>
 
-          {searchResultData.healthId && (
+          {abhaCardResult && (
             <Box
               sx={{
                 display: "flex",
