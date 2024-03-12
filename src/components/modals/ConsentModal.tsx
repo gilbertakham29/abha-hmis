@@ -76,29 +76,36 @@ function ConsentModal({
     requesterName: "",
     requesterType: "REGNO",
     requesterId: "MH1001",
-    permissionFromDate: new Date().toISOString(),
-    permissionToDate: new Date().toISOString(),
-    permissionExpiryDate: new Date().toISOString(),
+    permissionFromDate: new Date(),
+    permissionToDate: new Date(),
+    permissionExpiryDate: new Date(),
     hiTypesList: [],
   });
-  const handleFromDateChange = (date: string) => {
-    setFormData({
-      ...formData,
-      permissionFromDate: date,
-    });
+  const handleFromDateChange = (date: Date | null) => {
+    if (date) {
+      setFormData({
+        ...formData,
+        permissionFromDate: date,
+      });
+    }
   };
-  const handleToDateChange = (date: string) => {
-    setFormData({
-      ...formData,
-      permissionToDate: date,
-    });
+  const handleToDateChange = (date: Date | null) => {
+    if (date) {
+      setFormData({
+        ...formData,
+        permissionToDate: date,
+      });
+    }
   };
-  const handleFromExpiryChange = (date: string) => {
+
+  const handleFromExpiryChange = (date: Date | null) => {
     tomorrow.setDate(tomorrow.getDate() + 1);
-    setFormData({
-      ...formData,
-      permissionExpiryDate: date,
-    });
+    if (date) {
+      setFormData({
+        ...formData,
+        permissionExpiryDate: date,
+      });
+    }
   };
 
   const handleFormData =
@@ -250,8 +257,8 @@ function ConsentModal({
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
                 sx={{ mb: 2 }}
-                value={formData.permissionFromDate}
-                onChange={() => handleFromDateChange}
+                value={new Date(formData.permissionFromDate)}
+                onChange={handleFromDateChange}
                 slotProps={{ textField: { variant: "standard" } }}
               />
             </LocalizationProvider>
@@ -271,8 +278,8 @@ function ConsentModal({
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
                 sx={{ mb: 2 }}
-                value={formData.permissionToDate}
-                onChange={() => handleToDateChange}
+                value={new Date(formData.permissionToDate)}
+                onChange={handleToDateChange}
                 slotProps={{ textField: { variant: "standard" } }}
               />
             </LocalizationProvider>
@@ -329,8 +336,8 @@ function ConsentModal({
             </Typography>
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DateTimePicker
-                value={formData.permissionExpiryDate}
-                onChange={() => handleFromExpiryChange}
+                value={new Date(formData.permissionExpiryDate)}
+                onChange={handleFromExpiryChange}
                 sx={{ mb: 2 }}
                 slotProps={{ textField: { variant: "standard" } }}
               />

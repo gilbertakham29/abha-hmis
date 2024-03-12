@@ -35,6 +35,7 @@ interface State {
   resendAadhaarOtp: object;
   mobileOtp: object;
   verifyMobileOtpHealthId: object;
+
   prescriptions: string | number | object | [];
   getHealthInfoData: HealthInfoData[];
   getConsentHeaderData: ConsentHeaders[];
@@ -59,7 +60,10 @@ const initialState: State = {
   mobileOtp: {},
   verifyMobileOtpHealthId: {},
   prescriptions: [],
-  getHealthInfoData: [{ healthInformationTypeId: 0, code: "", display: "" }],
+  getHealthInfoData: [
+    { healthInformationTypeId: Number(""), code: "", display: "" },
+  ],
+
   getConsentHeaderData: [
     {
       abhaConsentHeaderId: "",
@@ -106,6 +110,7 @@ const rootReducerSlice = createSlice({
     createHealthIdOtp(state, action: PayloadAction<object>) {
       state.createHealthIdWithAadhaar = action.payload;
     },
+
     getHealthInfo(state, action: PayloadAction<Array<HealthInfoData>>) {
       state.getHealthInfoData = action.payload;
     },

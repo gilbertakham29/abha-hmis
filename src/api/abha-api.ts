@@ -264,9 +264,9 @@ export const initiateConsent = async (
   requesterNameInput: string,
   requesterTypeInput: string,
   requesterIdInput: string,
-  permissionFromDateInput: string | null,
-  permissionToDateInput: string | null,
-  permissionExpiryDateInput: string | null,
+  permissionFromDateInput: Date,
+  permissionToDateInput: Date,
+  permissionExpiryDateInput: Date,
   hiTypesListInput: string[]
 ) => {
   const data = {

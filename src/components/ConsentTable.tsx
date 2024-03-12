@@ -248,7 +248,7 @@ export default function ConsentTable() {
                           </TableCell>
 
                           <TableCell align="center">
-                            <Link to="/viewlist">
+                            <Link to="/viewlist" target="_blank">
                               <IconButton>
                                 <ArrowForwardIosIcon
                                   sx={{ color: "#00E676" }}
