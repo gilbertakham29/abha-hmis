@@ -72,10 +72,10 @@ function ConsentModal({
 
   const [formData, setFormData] = useState({
     healthId: "",
-    facilityId: "IN1410000152",
+    facilityId: "IN1410000107",
     requesterName: "",
     requesterType: "REGNO",
-    requesterId: "MH1001",
+    requesterId: "MN20200299",
     permissionFromDate: new Date(),
     permissionToDate: new Date(),
     permissionExpiryDate: new Date(),
