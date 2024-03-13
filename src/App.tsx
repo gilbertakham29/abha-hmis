@@ -12,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/patient" element={<PatientDashboard />} />
+
         <Route path="/consent" element={<ConsentForm />} />
         <Route path="/viewlist" element={<ViewList />} />
       </Routes>

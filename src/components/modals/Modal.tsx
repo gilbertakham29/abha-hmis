@@ -305,7 +305,7 @@ function ModalPopup({
             <OutlinedInput
               onChange={handlePhoneSearch}
               value={searchMobile}
-              sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
+              sx={{ width: "100%", backgroundColor: "#EEEEEE", mt: 2 }}
               placeholder="Enter ADHAAR/ABHA ID/MOBILE NO."
             />
             {error && (
