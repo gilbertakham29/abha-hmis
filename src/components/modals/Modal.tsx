@@ -365,7 +365,7 @@ function ModalPopup({
               }}
             ></Box>
             <OutlinedInput
-              sx={{ width: "100vh", backgroundColor: "#EEEEEE", mt: 2 }}
+              sx={{ width: "100%", backgroundColor: "#EEEEEE", mt: 2 }}
               placeholder="Enter ADHAAR"
               value={aadhaarInput}
               onChange={handleAdhaarInput}
