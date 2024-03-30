@@ -11,6 +11,9 @@ import {
   getHealthInfo,
   getConsentHeaderList,
   verifyMobileOtpCreateHealthId,
+  getRequestId,
+  getMobileOtpRequestId,
+  loginSuccess,
 } from "../redux/reducer";
 
 import { AppDispatch } from "../redux/store";
@@ -329,4 +332,113 @@ export const getConsentHeaders = async (
   const result = await response.json();
   dispatch(getConsentHeaderList(result));
   console.log(result);
+};
+export const getRequstIdData = async (
+  abhaIdInput: string,
+  requesterIdInput: string,
+  requesterTypeInput: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    abhaId: abhaIdInput,
+    requesterId: requesterIdInput,
+    requesterType: requesterTypeInput,
+  };
+  console.log(data);
+
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/Facilities/InitLinkingByMobileOtp",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  dispatch(getRequestId(result));
+  console.log(result);
+};
+export const confirmUsingMobileOtp = async (
+  requestIdInput: string,
+  otp: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    requestId: requestIdInput,
+    otp: otp,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/Facilities/ConfirmAuthUsingMobileOtp",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  dispatch(getMobileOtpRequestId(result));
+  console.log(result);
+};
+export const addCareContext = async (
+  requestIdInput: string,
+  patientMrnInput: string,
+  patientNameInput: string,
+  patientVisitInput: string,
+  messageInput: string
+) => {
+  const data = {
+    requestId: requestIdInput,
+    patientMrn: patientMrnInput,
+    patientName: patientNameInput,
+    patientVisitReference: patientVisitInput,
+    displayMessage: messageInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/Facilities/AddCareContext",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.status;
+  console.log(result);
+};
+export const loginUser = async (
+  emailInput: string,
+  passwordInput: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    email: emailInput,
+    password: passwordInput,
+  };
+  try {
+    const res = await fetch("http://localhost:3001/api/login", {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      throw new Error("Invalid email or password!");
+    }
+
+    const { token } = await res.json();
+    localStorage.setItem("token", token);
+    dispatch(loginSuccess(token));
+
+    // Navigate to the next page
+  } catch (error) {
+    console.error("Unable to sign in!");
+  }
 };

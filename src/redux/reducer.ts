@@ -24,7 +24,18 @@ export interface DemographicResult {
   healthIdNumber: string;
   healthId: string;
 }
-
+export interface InitiateLinking {
+  abhaId: string;
+  requestId: string;
+  requesterType: string;
+}
+export interface ConfirmWithMobileOtp {
+  requestId: string;
+  otp: string;
+}
+export interface User {
+  token: string;
+}
 interface State {
   searchResult: DemographicResult;
   abhaCardResult: string;
@@ -35,10 +46,12 @@ interface State {
   resendAadhaarOtp: object;
   mobileOtp: object;
   verifyMobileOtpHealthId: object;
-
+  user: User;
   prescriptions: string | number | object | [];
   getHealthInfoData: HealthInfoData[];
   getConsentHeaderData: ConsentHeaders[];
+  initiateLinkingData: object;
+  confirmMobileOtp: object;
 }
 
 const initialState: State = {
@@ -58,6 +71,9 @@ const initialState: State = {
   aadhaarVerification: {},
   resendAadhaarOtp: {},
   mobileOtp: {},
+  user: {
+    token: "",
+  },
   verifyMobileOtpHealthId: {},
   prescriptions: [],
   getHealthInfoData: [
@@ -74,6 +90,8 @@ const initialState: State = {
       permissionExpiryDate: "",
     },
   ],
+  initiateLinkingData: {},
+  confirmMobileOtp: {},
 };
 
 const rootReducerSlice = createSlice({
@@ -117,6 +135,18 @@ const rootReducerSlice = createSlice({
     getConsentHeaderList(state, action: PayloadAction<Array<ConsentHeaders>>) {
       state.getConsentHeaderData = action.payload;
     },
+    getRequestId(state, action: PayloadAction<object>) {
+      state.initiateLinkingData = action.payload;
+    },
+    getMobileOtpRequestId(state, action: PayloadAction<object>) {
+      state.confirmMobileOtp = action.payload;
+    },
+    loginSuccess: (state, action: PayloadAction<User>) => {
+      state.user.token = action.payload.token;
+    },
+    logoutSuccess: (state, action: PayloadAction<User>) => {
+      state.user = action.payload;
+    },
     exportPrescriptions(
       state,
       action: PayloadAction<string | number | object | []>
@@ -139,7 +169,10 @@ export const {
   generatePhoneOtp,
   verifyMobileOtpCreateHealthId,
   getConsentHeaderList,
+  getRequestId,
+  getMobileOtpRequestId,
   exportPrescriptions,
+  loginSuccess,
 } = rootReducerSlice.actions;
 
 export default rootReducerSlice.reducer;

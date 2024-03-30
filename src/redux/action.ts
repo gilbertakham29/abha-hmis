@@ -42,7 +42,19 @@ export const getHealthInfo = (result: []) => ({
   type: "GET_HEALTH_INFO",
   payload: result,
 });
+export const getRequestIdInfo = (result: object) => ({
+  type: "GET_REQUEST_ID",
+  payload: result,
+});
+export const getMobileOtpRequestId = (result: object) => ({
+  type: "GET_MOBILE_OTP_REQUEST_ID",
+  payload: result,
+});
 export const getConsentHeaderList = (result: []) => ({
   type: "GET_CONSENT_HEADER",
+  payload: result,
+});
+export const loginUserSuccess = (result: object) => ({
+  type: "GET_USER_TOKEN",
   payload: result,
 });

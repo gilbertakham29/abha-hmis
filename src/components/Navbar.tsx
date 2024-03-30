@@ -11,6 +11,7 @@ function Navbar() {
 
     setTimeout(() => {
       // Navigate to the next page
+      localStorage.removeItem("token");
       history("/");
       location.reload();
 
@@ -38,7 +39,18 @@ function Navbar() {
             PATIENT REGISTRATION
           </Typography>
         </Link>
-
+        <Link
+          to="/carecontext"
+          style={{ textDecoration: "none", color: "#fff" }}
+        >
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{ fontSize: 16, fontStyle: "bold" }}
+          >
+            CARE CONTEXT
+          </Typography>
+        </Link>
         <Link to="/consent" style={{ textDecoration: "none", color: "#fff" }}>
           <Typography
             variant="h6"
