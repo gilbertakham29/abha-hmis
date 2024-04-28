@@ -70,7 +70,7 @@ function Navbar() {
             right: 0,
             fontSize: "0.9rem",
             mx: 4,
-            position: "fixed",
+            position: "absolute",
           }}
         >
           Logout

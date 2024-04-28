@@ -58,3 +58,34 @@ export const loginUserSuccess = (result: object) => ({
   type: "GET_USER_TOKEN",
   payload: result,
 });
+export const patientList = (result: []) => ({
+  type: "GET_PATIENTLIST",
+  payload: result,
+});
+export const setErrorMessage = (errorMessage: object) => ({
+  type: "SET_ERROR_MESSAGE",
+  payload: errorMessage,
+});
+export const mobileNumberErrorMessage = (mobileNumberError: object) => ({
+  type: "MOBILE_NUMBER_ERROR",
+  payload: mobileNumberError,
+});
+export const optSuccessMessage = (otpSuccess: object) => ({
+  type: "OTP_SUCCESS_MESSAGE",
+  payload: otpSuccess,
+});
+export const clearErrorMessage = () => ({
+  type: "CLEAR_ERROR_MESSAGE",
+});
+export const mobileNumberMessage = (mobileNumberSuccess: object) => ({
+  type: "MOBILE_NUMBER_SUCCESS",
+  payload: mobileNumberSuccess,
+});
+export const mobileOtpSuccess = (mobileOtpSuccessMessage: object) => ({
+  type: "MOBILE_OTP_SUCCESS",
+  payload: mobileOtpSuccessMessage,
+});
+export const mobileOtpError = (mobileOtpErrorMessage: object) => ({
+  type: "MOBILE_OTP_ERROR",
+  payload: mobileOtpErrorMessage,
+});

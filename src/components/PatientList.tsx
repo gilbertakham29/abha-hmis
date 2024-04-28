@@ -3,7 +3,6 @@ import {
   Button,
   Container,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Paper,
@@ -16,17 +15,90 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import departments from "../../data.json";
+import { getAbhaCard, getQrcode, handleSearch } from "../api/abha-api";
+import { SelectChangeEvent } from "@mui/material";
 import { useState } from "react";
-
+import { fetchPatientList } from "../api/abha-api";
+import { useSelector } from "react-redux";
+import { PatientListData } from "../redux/reducer";
+import { useDispatch } from "react-redux";
+import ModalPopup from "./modals/Modal";
+import DownloadIcon from "@mui/icons-material/Download";
+import { handleDownload } from "../actions/download";
 function PatientList() {
   const [showTable, setShowTable] = useState(false);
-  const openTable = () => {
-    setShowTable(true);
+  const [uhid, setUhid] = useState("");
+  const [name, setName] = useState("");
+  const [dateFrom, setDateFrom] = useState(new Date().toISOString());
+  const [gender, setGender] = useState("");
+  //const [isActive, setIsActive] = useState("");
+  const [openModal, setOpenModal] = useState(false);
+  type RootState = {
+    abhaCardResult: string;
+    patientList: PatientListData[];
   };
 
+  const abhaCardResult = useSelector(
+    (state: RootState) => state.abhaCardResult
+  );
+  const handleModal = () => {
+    setOpenModal(true);
+  };
+  const handleClose = () => {
+    setOpenModal(false);
+  };
+  const patientSearchResult = useSelector(
+    (state: RootState) => state.patientList
+  );
+  console.log(patientSearchResult);
+
+  const handleUhid = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUhid(e.target.value);
+  };
+  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+  const handleDateFrom = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setDateFrom(e.target.value);
+  };
+  const handleGender = (e: SelectChangeEvent<string>) => {
+    setGender(e.target.value);
+  };
+
+  //const activeBit = isActive == "Active" ? 1 : 0;
+  const dispatch = useDispatch();
+  const phoneNumber = patientSearchResult
+    .map((patient) => patient.ContactNo)
+    .toString();
+
+  const searchPatient = async () => {
+    const result = await fetchPatientList(
+      uhid,
+      name,
+      dateFrom,
+      gender,
+      dispatch
+    );
+
+    setShowTable(true);
+    //const phoneNumber = result.map(())
+    const responseData = await handleSearch(phoneNumber, dispatch);
+
+    const [abhaCard, abhaQr] = await Promise.all([
+      getAbhaCard(responseData.abhaAccountID, dispatch),
+      getQrcode(responseData.abhaAccountID, dispatch),
+    ]);
+    console.log(abhaCard, abhaQr);
+    console.log(result);
+  };
+
+  const handleReset = () => {
+    setUhid("");
+    setName("");
+    setGender("");
+    setDateFrom("");
+    setShowTable(false);
+  };
   return (
     <>
       <Container
@@ -55,11 +127,15 @@ function PatientList() {
           <TextField
             variant="outlined"
             label="UHID"
+            value={uhid}
+            onChange={handleUhid}
             placeholder="type uhid here..."
           />
           <TextField
             variant="outlined"
             label="Patient name"
+            value={name}
+            onChange={handleName}
             placeholder="patient name here...."
           />
           <div style={{ display: "inline-flex", gap: 3 }}>
@@ -67,6 +143,8 @@ function PatientList() {
               type="date"
               InputLabelProps={{ shrink: true }}
               label="Date From*"
+              value={dateFrom}
+              onChange={handleDateFrom}
               placeholder="Date from*"
             />
             <TextField placeholder="00:00" sx={{ width: "20%" }} />
@@ -126,49 +204,15 @@ function PatientList() {
               labelId="demo-simple-select-label"
               id="demo-simple-select"
               label="Age"
+              value={gender}
+              onChange={handleGender}
             >
-              <MenuItem value="Male">Male</MenuItem>
-              <MenuItem value="Female">Female</MenuItem>
-              <MenuItem value="Transgender">Transgender</MenuItem>
+              <MenuItem value="M">M</MenuItem>
+              <MenuItem value="F">F</MenuItem>
+              <MenuItem value="Trans">Trans</MenuItem>
             </Select>
           </FormControl>
-          <FormControl
-            sx={{
-              mt: 3,
-              width: "20%",
-            }}
-          >
-            <InputLabel id="demo-simple-select-label">Status</InputLabel>
 
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Age"
-            >
-              <MenuItem value="Active">Active</MenuItem>
-              <MenuItem value="Inactive">Inactive</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl
-            sx={{
-              mt: 3,
-              width: "20%",
-            }}
-          >
-            <InputLabel id="demo-simple-select-label">Department</InputLabel>
-
-            <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
-              label="Age"
-            >
-              {departments.department.map((dept, item) => (
-                <MenuItem value={dept.name} key={item}>
-                  {dept.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
           <div
             style={{
               display: "inline-flex",
@@ -184,7 +228,7 @@ function PatientList() {
                 ":hover": { backgroundColor: "#0288D1" },
               }}
               size="medium"
-              onClick={openTable}
+              onClick={searchPatient}
             >
               Search
             </Button>
@@ -192,6 +236,7 @@ function PatientList() {
               size="medium"
               sx={{ color: "#BDBDBD", borderColor: "#EEEEEE" }}
               variant="outlined"
+              onClick={handleReset}
             >
               Reset
             </Button>
@@ -202,109 +247,113 @@ function PatientList() {
         <TableContainer component={Paper} sx={{ mt: 3 }}>
           <Table sx={{}} aria-label="simple table">
             <TableHead>
-              <TableRow>
-                <TableCell>SL No</TableCell>
-                <TableCell>HID</TableCell>
-                <TableCell>PATIENT NAME</TableCell>
-                <TableCell>GENDER</TableCell>
-                <TableCell>AGE</TableCell>
-                <TableCell>MOBILE NO</TableCell>
-                <TableCell>ADDRESS</TableCell>
-                <TableCell>ADDED ON</TableCell>
-                <TableCell>MOBILE NO</TableCell>
-                <TableCell>ADDED BY</TableCell>
+              <TableRow sx={{ backgroundColor: "#EEEEEE", color: "#fff" }}>
+                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                  SL No
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  HID
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  PATIENT NAME
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  GENDER
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  AGE
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  MOBILE NO
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  ADDRESS
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  ADDED ON
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  ABHA No
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  ABHA ADDRESS
+                </TableCell>
 
-                <TableCell>ACTION</TableCell>
-
-                <TableCell>CREATE ABHA</TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  CREATE ABHA
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                  DOWNLOAD
+                </TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  1
-                </TableCell>
-                <TableCell>KAHRI-HID2318207</TableCell>
-                <TableCell>Miss. Khumukcham Priya </TableCell>
-                <TableCell>FEMALE</TableCell>
-                <TableCell>24 </TableCell>
-                <TableCell>9774087309</TableCell>
-                <TableCell>Khagempalli</TableCell>
-                <TableCell>02-11-2023:03:41:02</TableCell>
-                <TableCell>G. A. Sangeeta Devi</TableCell>
-                <TableCell>Ravi</TableCell>
+            {patientSearchResult.map((patient) => {
+              return (
+                <>
+                  {showTable && (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="center" component="th" scope="row">
+                          {patient.PatientID}
+                        </TableCell>
+                        <TableCell align="center">{patient.UHID}</TableCell>
+                        <TableCell align="center">
+                          {patient.PatientName}
+                        </TableCell>
+                        <TableCell align="center">{patient.Gender}</TableCell>
+                        <TableCell align="center">{patient.Age}</TableCell>
+                        <TableCell align="center">
+                          {patient.ContactNo}
+                        </TableCell>
+                        <TableCell align="center">
+                          {patient.PermanentAddress}
+                        </TableCell>
+                        <TableCell align="center">
+                          {patient.AddedDate}
+                        </TableCell>
+                        <TableCell align="center">{patient.AbhaID}</TableCell>
+                        <TableCell align="center">
+                          {patient.AbhaAddress}
+                        </TableCell>
 
-                <TableCell>
-                  <Box
-                    sx={{
-                      display: "inline-flex",
-                      justifyContent: "flex-start",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IconButton>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    size="small"
-                    sx={{ fontSize: "0.6rem", height: 42 }}
-                  >
-                    CREATE ABHA
-                  </Button>
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell component="th" scope="row">
-                  2
-                </TableCell>
-                <TableCell>KAHRI-HID2318207</TableCell>
-                <TableCell>Miss. Khumukcham Priya </TableCell>
-                <TableCell>FEMALE</TableCell>
-                <TableCell>24 </TableCell>
-                <TableCell>9774087309</TableCell>
-                <TableCell>Khagempalli</TableCell>
-                <TableCell>02-11-2023:03:41:02</TableCell>
-                <TableCell>G. A. Sangeeta Devi</TableCell>
-                <TableCell>Nikhil N</TableCell>
-
-                <TableCell>
-                  <Box
-                    sx={{
-                      display: "inline-flex",
-                      justifyContent: "flex-start",
-                      alignItems: "center",
-                    }}
-                  >
-                    <IconButton>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton>
-                      <DeleteIcon />
-                    </IconButton>
-                  </Box>
-                </TableCell>
-
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    sx={{ fontSize: "0.6rem", height: 42 }}
-                  >
-                    CREATE ABHA
-                  </Button>
-                </TableCell>
-              </TableRow>
-            </TableBody>
+                        <TableCell>
+                          {patient.IsABHACreated ? (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              disabled
+                              sx={{ fontSize: "0.6rem", height: 42 }}
+                            >
+                              CREATE ABHA
+                            </Button>
+                          ) : (
+                            <Button
+                              variant="contained"
+                              size="small"
+                              onClick={handleModal}
+                              sx={{ fontSize: "0.6rem", height: 42 }}
+                            >
+                              CREATE ABHA
+                            </Button>
+                          )}
+                        </TableCell>
+                        <TableCell align="center">
+                          <Button
+                            variant="contained"
+                            startIcon={<DownloadIcon />}
+                            onClick={() => handleDownload(abhaCardResult)}
+                          ></Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  )}
+                </>
+              );
+            })}
           </Table>
         </TableContainer>
       )}
+      {openModal && <ModalPopup isOpen={openModal} isClose={handleClose} />}
     </>
   );
 }

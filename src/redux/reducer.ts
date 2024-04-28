@@ -24,6 +24,24 @@ export interface DemographicResult {
   healthIdNumber: string;
   healthId: string;
 }
+export interface PatientListData {
+  AbhaAddress: string;
+  AbhaID: string;
+  AddedDate: string;
+  Age: number;
+  ContactNo: string;
+  DOB: string;
+  Gender: string;
+  IsABHACreated: boolean;
+  IsActive: boolean;
+  PatientID: string;
+  PatientName: string;
+  PermanentAddress: string;
+  Pin: number;
+  State: string;
+  Title: string;
+  UHID: string;
+}
 export interface InitiateLinking {
   abhaId: string;
   requestId: string;
@@ -38,6 +56,7 @@ export interface User {
 }
 interface State {
   searchResult: DemographicResult;
+  patientList: PatientListData[];
   abhaCardResult: string;
   abhaQrCode: string;
   abhaInitiation: object;
@@ -47,11 +66,18 @@ interface State {
   mobileOtp: object;
   verifyMobileOtpHealthId: object;
   user: User;
+  clearMessage: string;
   prescriptions: string | number | object | [];
   getHealthInfoData: HealthInfoData[];
   getConsentHeaderData: ConsentHeaders[];
   initiateLinkingData: object;
   confirmMobileOtp: object;
+  otpSuccess: object;
+  errorMessage: object;
+  mobileNumberSuccess: object;
+  mobileNumberError: object;
+  mobileOtpSuccess: object;
+  mobileOtpError: object;
 }
 
 const initialState: State = {
@@ -64,6 +90,26 @@ const initialState: State = {
     healthIdNumber: "",
     healthId: "",
   },
+  patientList: [
+    {
+      AbhaAddress: "",
+      AbhaID: "",
+      AddedDate: "",
+      Age: Number(""),
+      ContactNo: "",
+      DOB: "",
+      Gender: "",
+      IsABHACreated: false,
+      IsActive: false,
+      PatientID: "",
+      PatientName: "",
+      PermanentAddress: "",
+      Pin: Number(""),
+      State: "",
+      Title: "",
+      UHID: "",
+    },
+  ],
   abhaCardResult: "",
   abhaQrCode: "",
   abhaInitiation: {},
@@ -74,6 +120,7 @@ const initialState: State = {
   user: {
     token: "",
   },
+  clearMessage: "",
   verifyMobileOtpHealthId: {},
   prescriptions: [],
   getHealthInfoData: [
@@ -92,6 +139,12 @@ const initialState: State = {
   ],
   initiateLinkingData: {},
   confirmMobileOtp: {},
+  otpSuccess: {},
+  errorMessage: {},
+  mobileNumberSuccess: {},
+  mobileNumberError: {},
+  mobileOtpSuccess: {},
+  mobileOtpError: {},
 };
 
 const rootReducerSlice = createSlice({
@@ -100,6 +153,9 @@ const rootReducerSlice = createSlice({
   reducers: {
     setSearchResult(state, action: PayloadAction<DemographicResult>) {
       state.searchResult = action.payload;
+    },
+    getPatientList(state, action: PayloadAction<Array<PatientListData>>) {
+      state.patientList = action.payload;
     },
     getAbhaCardResult(state, action: PayloadAction<string>) {
       state.abhaCardResult = action.payload;
@@ -147,17 +203,39 @@ const rootReducerSlice = createSlice({
     logoutSuccess: (state, action: PayloadAction<User>) => {
       state.user = action.payload;
     },
+    setErrorMessage: (state, action: PayloadAction<object>) => {
+      state.errorMessage = action.payload;
+    },
     exportPrescriptions(
       state,
       action: PayloadAction<string | number | object | []>
     ) {
       state.prescriptions = action.payload;
     },
+    clearErrorMessage: (state) => {
+      state.clearMessage = "";
+    },
+    optSuccessMessage: (state, action: PayloadAction<object>) => {
+      state.otpSuccess = action.payload;
+    },
+    mobileNumberMessage: (state, action: PayloadAction<object>) => {
+      state.mobileNumberSuccess = action.payload;
+    },
+    mobileNumberError: (state, action: PayloadAction<object>) => {
+      state.mobileNumberError = action.payload;
+    },
+    mobileOtpSuccess: (state, action: PayloadAction<object>) => {
+      state.mobileOtpSuccess = action.payload;
+    },
+    mobileOtpError: (state, action: PayloadAction<object>) => {
+      state.mobileOtpError = action.payload;
+    },
   },
 });
 
 export const {
   setSearchResult,
+  getPatientList,
   getAbhaCardResult,
   getAbhaQrCode,
   abhaRegistration,
@@ -173,6 +251,13 @@ export const {
   getMobileOtpRequestId,
   exportPrescriptions,
   loginSuccess,
+  setErrorMessage,
+  clearErrorMessage,
+  optSuccessMessage,
+  mobileNumberMessage,
+  mobileNumberError,
+  mobileOtpSuccess,
+  mobileOtpError,
 } = rootReducerSlice.actions;
 
 export default rootReducerSlice.reducer;

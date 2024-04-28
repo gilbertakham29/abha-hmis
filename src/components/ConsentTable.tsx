@@ -32,13 +32,14 @@ interface Column {
 }
 
 const columns: Column[] = [
-  { id: "patientIdentifier", label: "Patient Identifier", minWidth: 100 },
+  { id: "patientIdentifier", label: "ABHA Address", minWidth: 100 },
   {
     id: "requestStatus",
     label: "Request Status",
     minWidth: 100,
     format: (value: number) => value.toLocaleString("en-US"),
   },
+
   {
     id: "consentDate",
     label: "Consent Date",
@@ -59,6 +60,7 @@ const columns: Column[] = [
 
     format: (value: number) => value.toFixed(2),
   },
+
   {
     id: "view",
     label: "View",
@@ -162,7 +164,7 @@ export default function ConsentTable() {
                       }}
                     >
                       <Typography variant="h2" sx={{ fontSize: "0.9rem" }}>
-                        Date From
+                        Health Info From Date
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker
@@ -181,7 +183,7 @@ export default function ConsentTable() {
                       }}
                     >
                       <Typography variant="h2" sx={{ fontSize: "0.9rem" }}>
-                        Date To
+                        Health Info To Date
                       </Typography>
                       <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <DatePicker

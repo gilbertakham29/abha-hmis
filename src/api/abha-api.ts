@@ -14,6 +14,14 @@ import {
   getRequestId,
   getMobileOtpRequestId,
   loginSuccess,
+  getPatientList,
+  setErrorMessage,
+  clearErrorMessage,
+  optSuccessMessage,
+  mobileNumberMessage,
+  mobileNumberError,
+  mobileOtpSuccess,
+  mobileOtpError,
 } from "../redux/reducer";
 
 import { AppDispatch } from "../redux/store";
@@ -118,6 +126,7 @@ export const initAbhaRegistration = async (
     );
     const result = await response.json();
     dispatch(abhaRegistration(result));
+
     console.log(result);
   } catch (error) {
     console.error("Fail to initiate registration! Please try again.", error);
@@ -143,7 +152,19 @@ export const verifyAadhaarOtp = async (
     }
   );
   const result = await response.json();
-  dispatch(verifyAadhaar(result));
+  console.log(result);
+
+  if (response.status === 200) {
+    // OTP is valid
+    console.log("OTP is valid");
+    dispatch(clearErrorMessage());
+    dispatch(verifyAadhaar(result));
+    dispatch(optSuccessMessage(result));
+  } else {
+    // OTP is invalid, update error message
+    dispatch(setErrorMessage(result));
+  }
+
   console.log(result);
 };
 export const generateMobileOtp = async (
@@ -166,7 +187,18 @@ export const generateMobileOtp = async (
     }
   );
   const result = await response.json();
-  dispatch(generatePhoneOtp(result));
+
+  if (response.status === 200) {
+    // OTP is valid
+    console.log("Mobile No. is valid");
+    dispatch(clearErrorMessage());
+    dispatch(generatePhoneOtp(result));
+    dispatch(mobileNumberMessage(result));
+  } else {
+    // OTP is invalid, update error message
+    dispatch(mobileNumberError(result));
+  }
+
   console.log(result);
 };
 export const verifyMobileOtp = async (
@@ -189,7 +221,17 @@ export const verifyMobileOtp = async (
     }
   );
   const result = await response.json();
-  dispatch(verifyPhoneOtp(result));
+
+  if (response.status === 200) {
+    // OTP is valid
+    console.log("Mobile No. is valid");
+    dispatch(clearErrorMessage());
+    dispatch(verifyPhoneOtp(result));
+    dispatch(mobileOtpSuccess(result));
+  } else {
+    // OTP is invalid, update error message
+    dispatch(mobileOtpError(result));
+  }
   console.log(result);
 };
 export const resendOtp = async (
@@ -238,17 +280,15 @@ export const createHealthId = async (
 };
 export const verifyOtpandCreateHealthId = async (
   aadhaarInput: string,
-  otp: number,
-  email: string,
+  abhaAddressInput: string,
   dispatch: AppDispatch
 ) => {
   const data = {
     aadhaar: aadhaarInput,
-    otp: otp,
-    emailId: email,
+    abhaAddress: abhaAddressInput,
   };
   const response = await fetch(
-    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/VerifyMobileOtpAndGenerateHealthId",
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/GenerateHealthIdPreVerified",
     {
       method: "POST",
       headers: {
@@ -441,4 +481,78 @@ export const loginUser = async (
   } catch (error) {
     console.error("Unable to sign in!");
   }
+};
+export const submitPatient = async (
+  abhaIdInput: string,
+  titleInput: string,
+  abhaAddressInput: string,
+  nameInput: string,
+  pincodeInput: string,
+  dobInput: string,
+  ageInput: number,
+  addressInput: string,
+  genderInput: string,
+  phoneInput: string,
+  stateInput: string,
+  IsABHACreatedInput: number
+) => {
+  const data = {
+    AbhaID: abhaIdInput,
+    Title: titleInput,
+    AbhaAddress: abhaAddressInput,
+    PatientName: nameInput,
+    Pin: pincodeInput,
+    DOB: dobInput,
+    Age: ageInput,
+    PermanentAddress: addressInput,
+    Gender: genderInput,
+    ContactNo: phoneInput,
+    State: stateInput,
+    IsABHACreated: IsABHACreatedInput,
+  };
+  const response = await fetch("http://localhost:5000/api/patientdetails", {
+    method: "POST",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  console.log(result);
+};
+export const fetchPatientList = async (
+  uhidInput: string,
+  nameInput: string,
+  dateFromInput: string,
+  genderInput: string,
+
+  dispatch: AppDispatch
+) => {
+  const data: { [key: string]: string } = {};
+
+  // Conditionally add parameters to the data object if they are provided
+  if (uhidInput && !nameInput && !dateFromInput && !genderInput) {
+    data.UHID = uhidInput;
+  } else if (nameInput && !uhidInput && !dateFromInput && !genderInput) {
+    data.PatientName = nameInput;
+  } else if (dateFromInput && !uhidInput && !nameInput && !genderInput) {
+    data.AddedDate = dateFromInput;
+  } else if (genderInput && !uhidInput && !nameInput && !dateFromInput) {
+    data.Gender = genderInput;
+  } else {
+    throw new Error("Please provide only one parameter for search");
+  }
+
+  const response = await fetch("http://localhost:5000/api/patientlist", {
+    method: "POST",
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
+  const result = await response.json();
+  dispatch(getPatientList(result));
+  console.log(result);
 };

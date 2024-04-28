@@ -1,4 +1,5 @@
 import Navbar from "./Navbar";
+import DownloadIcon from "@mui/icons-material/Download";
 import {
   Box,
   Tabs,
@@ -22,7 +23,9 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import ModalPopup from "./modals/Modal";
 import { useSelector } from "react-redux";
 import PatientList from "./PatientList";
-
+import { submitPatient } from "../api/abha-api";
+import DataModal from "./modals/DataAdded";
+import { handleDownload } from "../actions/download";
 function PatientDashboard() {
   function calculateAge(dateString: string) {
     // Parse the date string to a Date object
@@ -64,13 +67,15 @@ function PatientDashboard() {
 
   type RootState = {
     searchResult: getDemographicsResult;
-    abhaCardResult: object;
+    abhaCardResult: string;
     abhaQrCode: object;
   };
 
   const [state, setState] = useState(initialState);
   const { showForm, openModal } = state;
-
+  const [initValue, setValue] = useState("");
+  const [title, setTitle] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
   // Use useSelector to select the searchResult from the Redux store
   const searchResultData = useSelector(
     (state: RootState) => state.searchResult
@@ -83,9 +88,12 @@ function PatientDashboard() {
   const abhaQrCodeResult = useSelector((state: RootState) => state.abhaQrCode);
   console.log(searchResultData);
   const age = calculateAge(searchResultData.dob);
+
   //const age = calculateAge(Number(searchResult.dob));
   //console.log(age);
-
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
   const patientDetails = () => {
     setState({
       ...state,
@@ -110,6 +118,37 @@ function PatientDashboard() {
       ...state,
       openModal: false,
     });
+  };
+  const dialogClose = () => {
+    setOpenDialog(false);
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+  const isAbhaCreated =
+    searchResultData.healthId && searchResultData.healthIdNumber ? 1 : 0;
+  const handleSubmit = async () => {
+    setOpenDialog(true);
+
+    const result = await submitPatient(
+      searchResultData.healthIdNumber,
+      title,
+      searchResultData.healthId,
+      searchResultData.name,
+      searchResultData.pinCode,
+      searchResultData.dob,
+      age,
+      searchResultData.address,
+      searchResultData.gender,
+      searchResultData.mobile,
+      searchResultData.stateName,
+      isAbhaCreated
+    );
+    console.log(result);
+    setOpenDialog(true);
+    setTimeout(() => {
+      setOpenDialog(false);
+    }, 2000);
   };
   return (
     <div className="p-2">
@@ -183,12 +222,17 @@ function PatientDashboard() {
                 required
                 id="outlined-required"
                 label="Title"
+                value={title}
+                onChange={handleTitle}
               />
               <TextField
-                value={searchResultData.name}
+                value={
+                  searchResultData.name ? searchResultData.name : initValue
+                }
                 InputLabelProps={{
                   shrink: searchResultData.name !== "", // shrink label if value is not empty
                 }}
+                onChange={handleChange}
                 variant="outlined"
                 required
                 id="outlined-required"
@@ -196,10 +240,15 @@ function PatientDashboard() {
               />
               <TextField
                 variant="outlined"
-                value={searchResultData.pinCode}
+                value={
+                  searchResultData.pinCode
+                    ? searchResultData.pinCode
+                    : initValue
+                }
                 InputLabelProps={{
                   shrink: searchResultData.pinCode !== "", // shrink label if value is not empty
                 }}
+                onChange={handleChange}
                 required
                 id="outlined-required"
                 placeholder="Pin"
@@ -218,8 +267,9 @@ function PatientDashboard() {
               <TextField
                 type="datetime-local"
                 variant="outlined"
-                value={searchResultData.dob ? searchResultData.dob : null}
+                value={searchResultData.dob ? searchResultData.dob : initValue}
                 required
+                onChange={handleChange}
                 placeholder="Date of Birth"
                 id="outlined-required"
                 sx={{ width: "30%" }}
@@ -236,10 +286,15 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={searchResultData.address}
+                value={
+                  searchResultData.address
+                    ? searchResultData.address
+                    : initValue
+                }
                 InputLabelProps={{
                   shrink: searchResultData.address !== "", // shrink label if value is not empty
                 }}
+                onChange={handleChange}
                 id="outlined-required"
                 placeholder="Permanent Address"
                 sx={{ width: "30%" }}
@@ -258,25 +313,39 @@ function PatientDashboard() {
               <FormControl sx={{ width: "30%" }}>
                 <InputLabel id="demo-simple-select-label">Gender</InputLabel>
 
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  label="Age"
-                  value={searchResultData.gender ? searchResultData.gender : ""}
-                >
-                  {searchResultData.gender}
-                  {searchResultData.gender ? (
-                    <MenuItem value={searchResultData.gender}>
-                      {searchResultData.gender}
+                {searchResultData.gender ? (
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Age"
+                    value={
+                      searchResultData.gender ? searchResultData.gender : ""
+                    }
+                  >
+                    <MenuItem
+                      value={
+                        searchResultData.gender ? searchResultData.gender : ""
+                      }
+                    >
+                      {searchResultData.gender ? searchResultData.gender : ""}
                     </MenuItem>
-                  ) : (
+                  </Select>
+                ) : (
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    label="Age"
+                    value={
+                      searchResultData.gender ? searchResultData.gender : ""
+                    }
+                  >
                     <>
                       <MenuItem value="Male">Male</MenuItem>
                       <MenuItem value="Female">Female</MenuItem>
                       <MenuItem value="Transgender">Transgender</MenuItem>
                     </>
-                  )}
-                </Select>
+                  </Select>
+                )}
               </FormControl>
               <FormControl sx={{ width: "30%" }}>
                 <InputLabel id="demo-simple-select-label">
@@ -306,10 +375,13 @@ function PatientDashboard() {
             >
               <TextField
                 variant="outlined"
-                value={searchResultData.mobile}
+                value={
+                  searchResultData.mobile ? searchResultData.mobile : initValue
+                }
                 InputLabelProps={{
                   shrink: searchResultData.mobile !== "", // shrink label if value is not empty
                 }}
+                onChange={handleChange}
                 placeholder="Contact No."
                 sx={{ width: "30%" }}
               />
@@ -369,7 +441,9 @@ function PatientDashboard() {
                   id="demo-simple-select"
                   label="Relationships"
                   value={
-                    searchResultData.stateName ? searchResultData.stateName : ""
+                    searchResultData.stateName
+                      ? searchResultData.stateName
+                      : initValue
                   }
                 >
                   {searchResultData.stateName}
@@ -425,7 +499,7 @@ function PatientDashboard() {
                 size="medium"
                 onClick={handleModal}
               >
-                Get ABHA
+                Create ABHA
               </Button>
               {searchResultData.healthIdNumber && (
                 <Box sx={{ mt: 1 }}>
@@ -439,7 +513,7 @@ function PatientDashboard() {
               )}
             </Box>
 
-            <Button variant="contained" sx={{ mt: 2 }}>
+            <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>
               Submit
             </Button>
           </FormControl>
@@ -466,13 +540,20 @@ function PatientDashboard() {
                 src={`data:image/png;base64,${abhaQrCodeResult}`}
                 alt="QR"
               />
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={() => handleDownload(abhaCardResult)}
+              >
+                Download
+              </Button>
             </Box>
           )}
         </Container>
       ) : (
         <PatientList />
       )}
-
+      {openDialog && <DataModal isOpen={openDialog} onClose={dialogClose} />}
       {openModal && <ModalPopup isOpen={openModal} isClose={handleClose} />}
     </div>
   );
