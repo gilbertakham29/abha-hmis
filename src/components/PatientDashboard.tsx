@@ -389,7 +389,7 @@ function PatientDashboard() {
               />
               <FormControl sx={{ width: "30%" }}>
                 <InputLabel id="demo-simple-select-label">
-                  Realtionships
+                  Relationships
                 </InputLabel>
 
                 <Select
