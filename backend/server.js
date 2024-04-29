@@ -27,19 +27,6 @@ pool
   .then(() => console.log("Connected to database"))
   .catch((err) => console.error("Database connection failed:", err));
 
-// Define API endpoints
-app.get("/api/data", async (req, res) => {
-  try {
-    const result = await pool.query(
-      "SELECT TOP 1000 [ID],[Code],[Descriptions],[UserloginID],[AddedBy],[AddedDate],[ModifiedDate],[ModifiedBy],[IsActive] FROM [KDASHRI].[dbo].[CMS_Picaso_Relationship]"
-    );
-    res.json(result.recordset);
-  } catch (error) {
-    console.error("Error executing query:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
-
 app.post("/api/patientdetails", async (req, res) => {
   const {
     AbhaID,
@@ -55,6 +42,7 @@ app.post("/api/patientdetails", async (req, res) => {
     ContactNo,
     State,
     IsABHACreated,
+    IsActive,
   } = req.body;
   const request = pool.request();
   try {
@@ -72,7 +60,8 @@ app.post("/api/patientdetails", async (req, res) => {
     @Gender VARCHAR(50),
     @ContactNo VARCHAR(50),
     @State VARCHAR(200),
-    @IsABHACreated BIT
+    @IsABHACreated BIT,
+    @IsActive BIT
 
 SET @AbhaID = '${AbhaID}';
 SET @AbhaAddress = '${AbhaAddress}';
@@ -88,13 +77,14 @@ SET @Gender = '${Gender}';
 SET @ContactNo = '${ContactNo}';
 SET @State = '${State}';
 SET @IsABHACreated = '${IsABHACreated}';
+SET @IsActive = '${IsActive}'
 
 INSERT INTO [dbo].[ABHA_PatientDetails] (
 [AbhaID], [AbhaAddress],[UHID], [Title], [PatientName], [Pin], [DOB],
-[Age], [PermanentAddress], [Gender], [ContactNo], [State] , [IsABHACreated]
+[Age], [PermanentAddress], [Gender], [ContactNo], [State] , [IsABHACreated], [IsActive]
 ) VALUES (
 @AbhaID, @AbhaAddress,@PicasoNo, @Title, @PatientName, @Pin, @DOB,
-@Age, @PermanentAddress, @Gender, @ContactNo, @State, @IsABHACreated
+@Age, @PermanentAddress, @Gender, @ContactNo, @State, @IsABHACreated, @IsActive
 );`);
 
     // Execute query

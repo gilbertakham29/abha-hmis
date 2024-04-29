@@ -43,7 +43,7 @@ function SuccessDialog({
       >
         {" "}
         <CheckCircleIcon sx={{ color: "#00E676" }} />
-        {"Health id created successfully."}
+        {"ABHA Address created successfully."}
       </DialogTitle>
 
       <DialogActions>

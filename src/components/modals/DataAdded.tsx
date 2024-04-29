@@ -43,7 +43,7 @@ function DataModal({
       >
         {" "}
         <CheckCircleIcon sx={{ color: "#00E676" }} />
-        {"Data saved successfully."}
+        {"Patient Registered successfully."}
       </DialogTitle>
 
       <DialogActions>

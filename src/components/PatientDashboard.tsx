@@ -127,6 +127,7 @@ function PatientDashboard() {
   };
   const isAbhaCreated =
     searchResultData.healthId && searchResultData.healthIdNumber ? 1 : 0;
+  const isActive = 1;
   const handleSubmit = async () => {
     setOpenDialog(true);
 
@@ -142,7 +143,8 @@ function PatientDashboard() {
       searchResultData.gender,
       searchResultData.mobile,
       searchResultData.stateName,
-      isAbhaCreated
+      isAbhaCreated,
+      isActive
     );
     console.log(result);
     setOpenDialog(true);

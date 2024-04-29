@@ -177,8 +177,7 @@ function ModalPopup({
     // Handle submission or further processing
     setLoading(true);
     setAadhaarError("");
-    setBtnShow(false);
-    setAadhaarOtpInput(true);
+
     setLoading(false);
 
     setTimeout(async () => {
@@ -283,14 +282,15 @@ function ModalPopup({
       setLoading(false);
 
       if (otpMessage.message) {
+        setAadhaarAlert(true);
+        setAadhaarAlert(false);
         dispatch(clearErrorMessage());
         setAadhaarOtpInput(false);
 
-        setAadhaarAlert(true);
         setTimeout(() => {
+          setAadhaarAlert(false);
           setMobileNumber(true);
           setAadhaarOtpInput(false);
-          setAadhaarAlert(false);
         }, 3000);
       }
     }, 2000);
@@ -306,7 +306,6 @@ function ModalPopup({
 
     const result = await generateMobileOtp(aadhaarInput, phoneNumber, dispatch);
     setTimeout(() => {
-      setLoading(false);
       if (mobileNumberSuccess.message) {
         dispatch(clearErrorMessage());
 
@@ -320,6 +319,7 @@ function ModalPopup({
         }, 3000);
       }
     }, 2000);
+    setLoading(false);
     console.log(result);
   };
   const mobileOtpVerification = async (

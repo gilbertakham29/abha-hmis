@@ -494,7 +494,8 @@ export const submitPatient = async (
   genderInput: string,
   phoneInput: string,
   stateInput: string,
-  IsABHACreatedInput: number
+  IsABHACreatedInput: number,
+  isActiveInput: number
 ) => {
   const data = {
     AbhaID: abhaIdInput,
@@ -509,6 +510,7 @@ export const submitPatient = async (
     ContactNo: phoneInput,
     State: stateInput,
     IsABHACreated: IsABHACreatedInput,
+    IsActive: isActiveInput,
   };
   const response = await fetch("http://localhost:5000/api/patientdetails", {
     method: "POST",
