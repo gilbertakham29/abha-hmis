@@ -63,7 +63,6 @@ function CareContextForm() {
   const [requestIdContext, setRequestIdContext] = useState(false);
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
-  const [isValid, setIsValid] = useState(true);
   const dispatch = useDispatch();
   const [state, setState] = useState(initialState);
   const { showForm } = state;

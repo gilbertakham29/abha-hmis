@@ -15,7 +15,7 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { getAbhaCard, getQrcode, handleSearch } from "../api/abha-api";
+import { getAbhaCard, handleSearch } from "../api/abha-api";
 import { SelectChangeEvent } from "@mui/material";
 import { useState } from "react";
 import { fetchPatientList } from "../api/abha-api";
@@ -41,6 +41,8 @@ function PatientList() {
   const abhaCardResult = useSelector(
     (state: RootState) => state.abhaCardResult
   );
+  console.log(abhaCardResult);
+
   const handleModal = () => {
     setOpenModal(true);
   };
@@ -67,29 +69,32 @@ function PatientList() {
 
   //const activeBit = isActive == "Active" ? 1 : 0;
   const dispatch = useDispatch();
-  const phoneNumber = patientSearchResult
-    .map((patient) => patient.ContactNo)
-    .toString();
+  const phoneNumber = patientSearchResult[0].ContactNo;
 
   const searchPatient = async () => {
-    const result = await fetchPatientList(
-      uhid,
-      name,
-      dateFrom,
-      gender,
-      dispatch
-    );
+    try {
+      // Call fetchPatientList and handleSearch concurrently
+      const [result, responseData] = await Promise.all([
+        fetchPatientList(uhid, name, dateFrom, gender, dispatch),
+        handleSearch(phoneNumber, dispatch),
+      ]);
 
-    setShowTable(true);
-    //const phoneNumber = result.map(())
-    const responseData = await handleSearch(phoneNumber, dispatch);
+      if (responseData) {
+        // Start fetching abhaCard and abhaQr concurrently
+        const abhaCard = await getAbhaCard(
+          responseData.abhaAccountID,
+          dispatch
+        );
 
-    const [abhaCard, abhaQr] = await Promise.all([
-      getAbhaCard(responseData.abhaAccountID, dispatch),
-      getQrcode(responseData.abhaAccountID, dispatch),
-    ]);
-    console.log(abhaCard, abhaQr);
-    console.log(result);
+        console.log(abhaCard);
+      }
+      setShowTable(true);
+
+      console.log(result);
+    } catch (error) {
+      // Handle errors if any
+      console.error("Error:", error);
+    }
   };
 
   const handleReset = () => {
