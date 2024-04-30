@@ -69,33 +69,29 @@ function PatientList() {
 
   //const activeBit = isActive == "Active" ? 1 : 0;
   const dispatch = useDispatch();
-  const phoneNumbers = patientSearchResult.map((phone) => phone.ContactNo);
+  const phoneNumber = patientSearchResult
+    .map((phone) => phone.ContactNo)
+    .toString();
   //const handleSearchPromises = phoneNumbers.map((phoneNumber) => phoneNumber);
-
   const searchPatient = async () => {
-    try {
-      // Call fetchPatientList and handleSearch concurrently
-      const [result, responseData] = await Promise.all([
-        fetchPatientList(uhid, name, dateFrom, gender, dispatch),
-        Promise.all(
-          phoneNumbers.map((phoneNumber) => handleSearch(phoneNumber, dispatch))
-        ),
-      ]);
+    const result = await fetchPatientList(
+      uhid,
+      name,
+      dateFrom,
+      gender,
+      dispatch
+    );
 
-      // Start fetching abhaCard and abhaQr concurrently
-      const abhaCard = await getAbhaCard(responseData.abhaAccountID, dispatch);
+    setShowTable(true);
+    //const phoneNumber = result.map(())
+    const responseData = await handleSearch(phoneNumber, dispatch);
 
-      console.log(abhaCard);
-
-      setShowTable(true);
-
-      console.log(result);
-    } catch (error) {
-      // Handle errors if any
-      console.error("Error:", error);
-    }
+    const [abhaCard] = await Promise.all([
+      getAbhaCard(responseData.abhaAccountID, dispatch),
+    ]);
+    console.log(abhaCard);
+    console.log(result);
   };
-
   const handleReset = () => {
     setUhid("");
     setName("");
