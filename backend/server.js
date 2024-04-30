@@ -16,7 +16,7 @@ const config = {
   server: process.env.SERVER_NAME, // MSSQL server address
   database: process.env.DATABASE_NAME,
   options: {
-    encrypt: false, // To set true for production
+    encrypt: true, // To set true for production
   },
 };
 const pool = new ConnectionPool(config);
