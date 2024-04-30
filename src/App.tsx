@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import PatientDashboard from "./components/PatientDashboard";
 import ConsentForm from "./components/ConsentForm";
@@ -7,7 +7,7 @@ import CareContextForm from "./components/CareContextForm";
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
         <Route path="/" element={<LoginPage />} />
 
@@ -16,7 +16,7 @@ function App() {
         <Route path="/consent" element={<ConsentForm />} />
         <Route path="/viewlist" element={<ViewList />} />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
 }
 
