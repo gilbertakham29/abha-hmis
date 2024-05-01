@@ -69,7 +69,9 @@ function PatientList() {
 
   //const activeBit = isActive == "Active" ? 1 : 0;
   const dispatch = useDispatch();
-
+  const phoneNumber = patientSearchResult
+    .map((phone) => phone.ContactNo)
+    .toString();
   //const handleSearchPromises = phoneNumbers.map((phoneNumber) => phoneNumber);
   const searchPatient = async () => {
     const result = await fetchPatientList(
@@ -82,11 +84,6 @@ function PatientList() {
 
     setShowTable(true);
     //const phoneNumber = result.map(())
-    const phoneNumber = patientSearchResult
-      .map((phone) => phone.ContactNo)
-      .toString();
-    console.log(phoneNumber);
-
     const responseData = await handleSearch(phoneNumber, dispatch);
 
     const [abhaCard] = await Promise.all([
