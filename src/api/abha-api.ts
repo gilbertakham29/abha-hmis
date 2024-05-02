@@ -512,14 +512,17 @@ export const submitPatient = async (
     IsABHACreated: IsABHACreatedInput,
     IsActive: isActiveInput,
   };
-  const response = await fetch("http://localhost:5000/api/patientdetails", {
-    method: "POST",
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    "https://picasoid-abdm-backend.azurewebsites.net/api/patientdetails",
+    {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
   const result = await response.json();
   console.log(result);
 };
@@ -546,14 +549,17 @@ export const fetchPatientList = async (
     throw new Error("Please provide only one parameter for search");
   }
 
-  const response = await fetch("http://localhost:5000/api/patientlist", {
-    method: "POST",
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+  const response = await fetch(
+    "https://picasoid-abdm-backend.azurewebsites.net/api/patientlist",
+    {
+      method: "POST",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
   const result = await response.json();
   dispatch(getPatientList(result));
   console.log(result);
