@@ -513,7 +513,7 @@ export const submitPatient = async (
     IsActive: isActiveInput,
   };
   const response = await fetch(
-    "http://picasoid-abdm-backend.azurewebsites.net/api/patientdetails",
+    "https://picasoid-abdm-backend.azurewebsites.net/api/patientdetails",
     {
       method: "POST",
       headers: {
