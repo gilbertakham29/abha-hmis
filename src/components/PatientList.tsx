@@ -69,9 +69,7 @@ function PatientList() {
 
   //const activeBit = isActive == "Active" ? 1 : 0;
   const dispatch = useDispatch();
-  const phoneNumber = patientSearchResult
-    .map((phone) => phone.ContactNo)
-    .toString();
+
   //const handleSearchPromises = phoneNumbers.map((phoneNumber) => phoneNumber);
   const searchPatient = async () => {
     const result = await fetchPatientList(
@@ -81,16 +79,26 @@ function PatientList() {
       gender,
       dispatch
     );
+    console.log(result);
 
     setShowTable(true);
     //const phoneNumber = result.map(())
-    const responseData = await handleSearch(phoneNumber, dispatch);
+    const phoneNumbers = patientSearchResult.map((phone) => phone.ContactNo);
 
-    const [abhaCard] = await Promise.all([
-      getAbhaCard(responseData.abhaAccountID, dispatch),
-    ]);
-    console.log(abhaCard);
-    console.log(result);
+    // Perform handleSearch for each phone number
+    const searchResults = await Promise.all(
+      phoneNumbers.map((phoneNumber) => handleSearch(phoneNumber, dispatch))
+    );
+
+    // Assuming handleSearch returns an array of response data, you can process the results here
+    searchResults.forEach((responseData, index) => {
+      const [abhaCard] = responseData.abhaAccountID;
+      getAbhaCard(abhaCard[0], dispatch);
+      console.log(
+        `Search result for phone number ${phoneNumbers[index]}:`,
+        abhaCard
+      );
+    });
   };
   const handleReset = () => {
     setUhid("");
