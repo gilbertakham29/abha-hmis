@@ -2,6 +2,10 @@ export const setSearchResult = (result: object) => ({
   type: "SET_SEARCH_RESULT",
   payload: result,
 });
+export const setPatientResult = (result: object) => ({
+  type: "SET_PATIENT_RESULT",
+  payload: result,
+});
 export const getAbhaCardResult = (result: string) => ({
   type: "GET_ABHA_CARD_RESULT",
   payload: result,

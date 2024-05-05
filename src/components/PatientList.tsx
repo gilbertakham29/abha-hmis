@@ -15,12 +15,12 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { getAbhaCard, handleSearch } from "../api/abha-api";
+import { getAbhaCard, patientSearch } from "../api/abha-api";
 import { SelectChangeEvent } from "@mui/material";
 import { useState } from "react";
 import { fetchPatientList } from "../api/abha-api";
 import { useSelector } from "react-redux";
-import { PatientListData } from "../redux/reducer";
+import { PatientListData, PatientResult } from "../redux/reducer";
 import { useDispatch } from "react-redux";
 import ModalPopup from "./modals/Modal";
 import DownloadIcon from "@mui/icons-material/Download";
@@ -36,13 +36,15 @@ function PatientList() {
   type RootState = {
     abhaCardResult: string;
     patientList: PatientListData[];
+    patientResult: PatientResult;
   };
 
   const abhaCardResult = useSelector(
     (state: RootState) => state.abhaCardResult
   );
-  console.log(abhaCardResult);
 
+  console.log(abhaCardResult);
+  //const patientResult = useSelector((state: RootState) => state.patientResult);
   const handleModal = () => {
     setOpenModal(true);
   };
@@ -72,34 +74,30 @@ function PatientList() {
 
   //const handleSearchPromises = phoneNumbers.map((phoneNumber) => phoneNumber);
   const searchPatient = async () => {
-    const result = await fetchPatientList(
-      uhid,
-      name,
-      dateFrom,
-      gender,
-      dispatch
-    );
+    const result = await fetchPatientList(dispatch);
     console.log(result);
 
     setShowTable(true);
-    //const phoneNumber = result.map(())
-    const phoneNumbers = patientSearchResult.map((phone) => phone.ContactNo);
+    const phoneNumbers = patientSearchResult.map(
+      (phone) => phone.contactNumber
+    );
 
-    // Perform handleSearch for each phone number
+    // Perform patientSearch for each phone number
     const searchResults = await Promise.all(
-      phoneNumbers.map((phoneNumber) => handleSearch(phoneNumber, dispatch))
+      phoneNumbers.map((phoneNumber) => patientSearch(phoneNumber, dispatch))
     );
 
     // Assuming handleSearch returns an array of response data, you can process the results here
     searchResults.forEach((responseData, index) => {
-      const [abhaCard] = responseData.abhaAccountID;
-      getAbhaCard(abhaCard[0], dispatch);
+      const abhaCard = responseData.abhaAccountID[0] as number; // Explicitly cast to number
+      getAbhaCard(abhaCard, dispatch);
       console.log(
         `Search result for phone number ${phoneNumbers[index]}:`,
         abhaCard
       );
     });
   };
+
   const handleReset = () => {
     setUhid("");
     setName("");
@@ -302,30 +300,30 @@ function PatientList() {
                     <TableBody>
                       <TableRow>
                         <TableCell align="center" component="th" scope="row">
-                          {patient.PatientID}
+                          {patient.patientId}
                         </TableCell>
-                        <TableCell align="center">{patient.UHID}</TableCell>
+                        <TableCell align="center">{patient.uhid}</TableCell>
                         <TableCell align="center">
-                          {patient.PatientName}
+                          {patient.patientName}
                         </TableCell>
-                        <TableCell align="center">{patient.Gender}</TableCell>
-                        <TableCell align="center">{patient.Age}</TableCell>
+                        <TableCell align="center">{patient.gender}</TableCell>
+                        <TableCell align="center">{patient.age}</TableCell>
                         <TableCell align="center">
-                          {patient.ContactNo}
-                        </TableCell>
-                        <TableCell align="center">
-                          {patient.PermanentAddress}
+                          {patient.contactNumber}
                         </TableCell>
                         <TableCell align="center">
-                          {patient.AddedDate}
+                          {patient.permanentAddress}
                         </TableCell>
-                        <TableCell align="center">{patient.AbhaID}</TableCell>
                         <TableCell align="center">
-                          {patient.AbhaAddress}
+                          {patient.addedDate}
+                        </TableCell>
+                        <TableCell align="center">{patient.abhaId}</TableCell>
+                        <TableCell align="center">
+                          {patient.abhaAddress}
                         </TableCell>
 
                         <TableCell>
-                          {patient.IsABHACreated ? (
+                          {patient.isAbhaCreated ? (
                             <Button
                               variant="contained"
                               size="small"

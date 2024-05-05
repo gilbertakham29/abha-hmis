@@ -2,6 +2,7 @@ import {
   getAbhaCardResult,
   getAbhaQrCode,
   setSearchResult,
+  setPatientResult,
   abhaRegistration,
   createHealthIdOtp,
   verifyAadhaar,
@@ -47,6 +48,35 @@ export const handleSearch = async (
     const result = await response.json();
 
     dispatch(setSearchResult(result));
+    console.log(result);
+
+    return result;
+  } catch (error) {
+    console.error("Error fetching patient details:", error);
+  }
+};
+export const patientSearch = async (
+  phoneNumber: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    searchString: phoneNumber,
+  };
+  try {
+    const response = await fetch(
+      `https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/GetDemographics`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    const result = await response.json();
+
+    dispatch(setPatientResult(result));
     console.log(result);
 
     return result;
@@ -494,26 +524,26 @@ export const submitPatient = async (
   genderInput: string,
   phoneInput: string,
   stateInput: string,
-  IsABHACreatedInput: number,
-  isActiveInput: number
+  IsABHACreatedInput: boolean,
+  isActiveInput: boolean
 ) => {
   const data = {
-    AbhaID: abhaIdInput,
-    Title: titleInput,
-    AbhaAddress: abhaAddressInput,
-    PatientName: nameInput,
-    Pin: pincodeInput,
-    DOB: dobInput,
-    Age: ageInput,
-    PermanentAddress: addressInput,
-    Gender: genderInput,
-    ContactNo: phoneInput,
-    State: stateInput,
-    IsABHACreated: IsABHACreatedInput,
-    IsActive: isActiveInput,
+    abhaID: abhaIdInput,
+    title: titleInput,
+    abhaAddress: abhaAddressInput,
+    patientName: nameInput,
+    pin: pincodeInput,
+    dob: dobInput,
+    age: ageInput,
+    permanentAddress: addressInput,
+    gender: genderInput,
+    contactNumber: phoneInput,
+    state: stateInput,
+    isAbhaCreated: IsABHACreatedInput,
+    isActive: isActiveInput,
   };
   const response = await fetch(
-    "https://picasoid-abdm-backend.azurewebsites.net/api/patientdetails",
+    "https://dev-care-connect-api.azurewebsites.net/api/Patient/CreatePatient",
     {
       method: "POST",
       headers: {
@@ -526,37 +556,16 @@ export const submitPatient = async (
 
   console.log(result);
 };
-export const fetchPatientList = async (
-  uhidInput: string,
-  nameInput: string,
-  dateFromInput: string,
-  genderInput: string,
-
-  dispatch: AppDispatch
-) => {
-  const data: { [key: string]: string } = {};
-
+export const fetchPatientList = async (dispatch: AppDispatch) => {
   // Conditionally add parameters to the data object if they are provided
-  if (uhidInput && !nameInput && !dateFromInput && !genderInput) {
-    data.UHID = uhidInput;
-  } else if (nameInput && !uhidInput && !dateFromInput && !genderInput) {
-    data.PatientName = nameInput;
-  } else if (dateFromInput && !uhidInput && !nameInput && !genderInput) {
-    data.AddedDate = dateFromInput;
-  } else if (genderInput && !uhidInput && !nameInput && !dateFromInput) {
-    data.Gender = genderInput;
-  } else {
-    throw new Error("Please provide only one parameter for search");
-  }
 
   const response = await fetch(
-    "https://picasoid-abdm-backend.azurewebsites.net/api/patientlist",
+    "https://dev-care-connect-api.azurewebsites.net/api/Patient/GetPatient",
     {
-      method: "POST",
+      method: "GET",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
     }
   );
   const result = await response.json();

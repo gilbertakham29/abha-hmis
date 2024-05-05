@@ -24,23 +24,33 @@ export interface DemographicResult {
   healthIdNumber: string;
   healthId: string;
 }
+export interface PatientResult {
+  name: string;
+  pinCode: string;
+  dob: string;
+  address: string;
+  mobile: string;
+  healthIdNumber: string;
+  healthId: string;
+  abhaAccountID: number;
+}
 export interface PatientListData {
-  AbhaAddress: string;
-  AbhaID: string;
-  AddedDate: string;
-  Age: number;
-  ContactNo: string;
-  DOB: string;
-  Gender: string;
-  IsABHACreated: boolean;
-  IsActive: boolean;
-  PatientID: string;
-  PatientName: string;
-  PermanentAddress: string;
-  Pin: number;
-  State: string;
-  Title: string;
-  UHID: string;
+  abhaAddress: string;
+  abhaId: string;
+  addedDate: string;
+  age: number;
+  contactNumber: string;
+  dob: string;
+  gender: string;
+  isAbhaCreated: boolean;
+  isActive: boolean;
+  patientId: number;
+  patientName: string;
+  permanentAddress: string;
+  pin: number;
+  state: string;
+  title: string;
+  uhid: string;
 }
 export interface InitiateLinking {
   abhaId: string;
@@ -56,6 +66,7 @@ export interface User {
 }
 interface State {
   searchResult: DemographicResult;
+  patientResult: PatientResult;
   patientList: PatientListData[];
   abhaCardResult: string;
   abhaQrCode: string;
@@ -90,24 +101,34 @@ const initialState: State = {
     healthIdNumber: "",
     healthId: "",
   },
+  patientResult: {
+    name: "",
+    pinCode: "",
+    dob: "",
+    address: "",
+    mobile: "",
+    healthIdNumber: "",
+    healthId: "",
+    abhaAccountID: Number(""),
+  },
   patientList: [
     {
-      AbhaAddress: "",
-      AbhaID: "",
-      AddedDate: "",
-      Age: Number(""),
-      ContactNo: "",
-      DOB: "",
-      Gender: "",
-      IsABHACreated: false,
-      IsActive: false,
-      PatientID: "",
-      PatientName: "",
-      PermanentAddress: "",
-      Pin: Number(""),
-      State: "",
-      Title: "",
-      UHID: "",
+      abhaAddress: "",
+      abhaId: "",
+      addedDate: "",
+      age: Number(""),
+      contactNumber: "",
+      dob: "",
+      gender: "",
+      isAbhaCreated: false,
+      isActive: false,
+      patientId: Number(""),
+      patientName: "",
+      permanentAddress: "",
+      pin: Number(""),
+      state: "",
+      title: "",
+      uhid: "",
     },
   ],
   abhaCardResult: "",
@@ -153,6 +174,9 @@ const rootReducerSlice = createSlice({
   reducers: {
     setSearchResult(state, action: PayloadAction<DemographicResult>) {
       state.searchResult = action.payload;
+    },
+    setPatientResult(state, action: PayloadAction<PatientResult>) {
+      state.patientResult = action.payload;
     },
     getPatientList(state, action: PayloadAction<Array<PatientListData>>) {
       state.patientList = action.payload;
@@ -235,6 +259,7 @@ const rootReducerSlice = createSlice({
 
 export const {
   setSearchResult,
+  setPatientResult,
   getPatientList,
   getAbhaCardResult,
   getAbhaQrCode,
