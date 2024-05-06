@@ -64,11 +64,15 @@ export interface ConfirmWithMobileOtp {
 export interface User {
   token: string;
 }
+export interface AbhaCardList {
+  abhaCardResult: string;
+}
 interface State {
   searchResult: DemographicResult;
   patientResult: PatientResult;
   patientList: PatientListData[];
   abhaCardResult: string;
+  abhaCardList: AbhaCardList[];
   abhaQrCode: string;
   abhaInitiation: object;
   createHealthIdWithAadhaar: object;
@@ -132,6 +136,7 @@ const initialState: State = {
     },
   ],
   abhaCardResult: "",
+  abhaCardList: [],
   abhaQrCode: "",
   abhaInitiation: {},
   createHealthIdWithAadhaar: {},
@@ -183,6 +188,9 @@ const rootReducerSlice = createSlice({
     },
     getAbhaCardResult(state, action: PayloadAction<string>) {
       state.abhaCardResult = action.payload;
+    },
+    getAbhaCardResultList(state, action: PayloadAction<Array<AbhaCardList>>) {
+      state.abhaCardList = action.payload;
     },
     generatePhoneOtp(state, action: PayloadAction<object>) {
       state.mobileOtp = action.payload;
@@ -262,6 +270,7 @@ export const {
   setPatientResult,
   getPatientList,
   getAbhaCardResult,
+  getAbhaCardResultList,
   getAbhaQrCode,
   abhaRegistration,
   verifyAadhaar,

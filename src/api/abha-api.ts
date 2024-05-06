@@ -111,6 +111,7 @@ export const getAbhaCard = async (
     console.error("Error fetching card details:", error);
   }
 };
+
 export const getQrcode = async (
   abhaAccountID: number,
   dispatch: AppDispatch

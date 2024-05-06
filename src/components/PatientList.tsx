@@ -15,9 +15,9 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { getAbhaCard, patientSearch } from "../api/abha-api";
+import { getAbhaCard, handleSearch } from "../api/abha-api";
 import { SelectChangeEvent } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchPatientList } from "../api/abha-api";
 import { useSelector } from "react-redux";
 import { PatientListData, PatientResult } from "../redux/reducer";
@@ -26,6 +26,7 @@ import ModalPopup from "./modals/Modal";
 import DownloadIcon from "@mui/icons-material/Download";
 import { handleDownload } from "../actions/download";
 function PatientList() {
+  const dispatch = useDispatch();
   const [showTable, setShowTable] = useState(false);
   const [uhid, setUhid] = useState("");
   const [name, setName] = useState("");
@@ -33,6 +34,15 @@ function PatientList() {
   const [gender, setGender] = useState("");
   //const [isActive, setIsActive] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  useEffect(() => {
+    // Fetch patient list
+    fetchPatientList(dispatch);
+
+    // Clean up function
+    return () => {
+      // Any cleanup code if needed
+    };
+  }, [dispatch]);
   type RootState = {
     abhaCardResult: string;
     patientList: PatientListData[];
@@ -44,6 +54,7 @@ function PatientList() {
   );
 
   console.log(abhaCardResult);
+
   //const patientResult = useSelector((state: RootState) => state.patientResult);
   const handleModal = () => {
     setOpenModal(true);
@@ -70,32 +81,50 @@ function PatientList() {
   };
 
   //const activeBit = isActive == "Active" ? 1 : 0;
-  const dispatch = useDispatch();
 
   //const handleSearchPromises = phoneNumbers.map((phoneNumber) => phoneNumber);
   const searchPatient = async () => {
-    const result = await fetchPatientList(dispatch);
-    console.log(result);
-
     setShowTable(true);
-    const phoneNumbers = patientSearchResult.map(
-      (phone) => phone.contactNumber
-    );
+    try {
+      // Fetch patient list
+      const patientList = await fetchPatientList(dispatch);
+      console.log(patientList);
 
-    // Perform patientSearch for each phone number
-    const searchResults = await Promise.all(
-      phoneNumbers.map((phoneNumber) => patientSearch(phoneNumber, dispatch))
-    );
-
-    // Assuming handleSearch returns an array of response data, you can process the results here
-    searchResults.forEach((responseData, index) => {
-      const abhaCard = responseData.abhaAccountID[0] as number; // Explicitly cast to number
-      getAbhaCard(abhaCard, dispatch);
-      console.log(
-        `Search result for phone number ${phoneNumbers[index]}:`,
-        abhaCard
+      // Extract contact numbers from the patient list
+      const phoneNumbers = patientSearchResult.map(
+        (patient) => patient.contactNumber
       );
-    });
+
+      // Array to hold promises for fetching demographics for each patient
+      const demographicsPromises = phoneNumbers.map((phoneNumber) =>
+        handleSearch(phoneNumber, dispatch)
+      );
+
+      // Fetch demographics for each patient
+      const demographicsResults = await Promise.all(demographicsPromises);
+
+      // Array to hold promises for fetching abhaCard for each abhaAccountID
+      const phoneAbhaMap: Record<string, number> = {};
+      demographicsResults.forEach((demographicsResult, index) => {
+        phoneAbhaMap[phoneNumbers[index]] = demographicsResult.abhaAccountID;
+      });
+
+      // Array to hold promises for fetching abhaCard for each abhaAccountID
+      for (const phoneNumber of phoneNumbers) {
+        const abhaAccountID = phoneAbhaMap[phoneNumber];
+
+        const abhaCardResult = await getAbhaCard(abhaAccountID, dispatch);
+        console.log(
+          `Abha Card details for patient with contact number ${phoneNumber}:`,
+          abhaCardResult
+        );
+      }
+      // Process abhaCard results as needed
+
+      // Optionally, you can dispatch the abhaCardResults to Redux store or update component state if needed
+    } catch (error) {
+      console.error("Error occurred while fetching patient data:", error);
+    }
   };
 
   const handleReset = () => {
