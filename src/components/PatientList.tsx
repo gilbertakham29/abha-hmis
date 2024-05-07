@@ -15,7 +15,7 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-import { getAbhaCard, handleSearch } from "../api/abha-api";
+
 import { SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import { fetchPatientList } from "../api/abha-api";
@@ -23,8 +23,7 @@ import { useSelector } from "react-redux";
 import { PatientListData, PatientResult } from "../redux/reducer";
 import { useDispatch } from "react-redux";
 import ModalPopup from "./modals/Modal";
-import DownloadIcon from "@mui/icons-material/Download";
-import { handleDownload } from "../actions/download";
+
 function PatientList() {
   const dispatch = useDispatch();
   const [showTable, setShowTable] = useState(false);
@@ -91,13 +90,13 @@ function PatientList() {
       console.log(patientList);
 
       // Extract contact numbers from the patient list
-      const phoneNumbers = patientSearchResult.map(
+      /*const phoneNumbers = patientSearchResult.map(
         (patient) => patient.contactNumber
       );
 
       // Array to hold promises for fetching demographics for each patient
       const demographicsPromises = phoneNumbers.map((phoneNumber) =>
-        handleSearch(phoneNumber, dispatch)
+        patientSearch(phoneNumber, dispatch)
       );
 
       // Fetch demographics for each patient
@@ -110,15 +109,30 @@ function PatientList() {
       });
 
       // Array to hold promises for fetching abhaCard for each abhaAccountID
+      const abhaCardResults: Record<string, string | undefined> = {};
+
       for (const phoneNumber of phoneNumbers) {
         const abhaAccountID = phoneAbhaMap[phoneNumber];
 
+        // Fetch abhaCard for the current phoneNumber
         const abhaCardResult = await getAbhaCard(abhaAccountID, dispatch);
+
+        // Store the abhaCardResult for the current phoneNumber, handling undefined
+        if (abhaCardResult !== undefined) {
+          abhaCardResults[phoneNumber] = abhaCardResult;
+        } else {
+          // Handle the case where abhaCardResult is undefined, if needed
+          console.error(
+            `Abha Card result for phone number ${phoneNumber} is undefined.`
+          );
+        }
+
         console.log(
           `Abha Card details for patient with contact number ${phoneNumber}:`,
           abhaCardResult
         );
       }
+*/
       // Process abhaCard results as needed
 
       // Optionally, you can dispatch the abhaCardResults to Redux store or update component state if needed
@@ -280,45 +294,75 @@ function PatientList() {
       </Container>
       {showTable && (
         <TableContainer component={Paper} sx={{ mt: 3 }}>
-          <Table sx={{}} aria-label="simple table">
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow sx={{ backgroundColor: "#EEEEEE", color: "#fff" }}>
-                <TableCell sx={{ fontWeight: "bold" }} align="center">
+                <TableCell
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                  align="center"
+                >
                   SL No
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   HID
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   PATIENT NAME
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   GENDER
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   AGE
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   MOBILE NO
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   ADDRESS
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   ADDED ON
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   ABHA No
                 </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   ABHA ADDRESS
                 </TableCell>
 
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   CREATE ABHA
-                </TableCell>
-                <TableCell align="center" sx={{ fontWeight: "bold" }}>
-                  DOWNLOAD
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -371,13 +415,6 @@ function PatientList() {
                               CREATE ABHA
                             </Button>
                           )}
-                        </TableCell>
-                        <TableCell align="center">
-                          <Button
-                            variant="contained"
-                            startIcon={<DownloadIcon />}
-                            onClick={() => handleDownload(abhaCardResult)}
-                          ></Button>
                         </TableCell>
                       </TableRow>
                     </TableBody>
