@@ -74,7 +74,10 @@ function PatientDashboard() {
   const [state, setState] = useState(initialState);
   const { showForm, openModal } = state;
   const [initValue, setValue] = useState("");
+  const [name, setName] = useState("");
   const [title, setTitle] = useState("");
+  const [pincode, setPincode] = useState("");
+  const [ageNum, setageNum] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   // Use useSelector to select the searchResult from the Redux store
   const searchResultData = useSelector(
@@ -93,6 +96,15 @@ function PatientDashboard() {
   //console.log(age);
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTitle(e.target.value);
+  };
+  const handleName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
+  };
+  const handlePincode = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPincode(e.target.value);
+  };
+  const handleAge = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setageNum(e.target.value);
   };
   const patientDetails = () => {
     setState({
@@ -228,13 +240,11 @@ function PatientDashboard() {
                 onChange={handleTitle}
               />
               <TextField
-                value={
-                  searchResultData.name ? searchResultData.name : initValue
-                }
+                value={searchResultData.name ? searchResultData.name : name}
                 InputLabelProps={{
                   shrink: searchResultData.name !== "", // shrink label if value is not empty
                 }}
-                onChange={handleChange}
+                onChange={handleName}
                 variant="outlined"
                 required
                 id="outlined-required"
@@ -243,14 +253,12 @@ function PatientDashboard() {
               <TextField
                 variant="outlined"
                 value={
-                  searchResultData.pinCode
-                    ? searchResultData.pinCode
-                    : initValue
+                  searchResultData.pinCode ? searchResultData.pinCode : pincode
                 }
                 InputLabelProps={{
                   shrink: searchResultData.pinCode !== "", // shrink label if value is not empty
                 }}
-                onChange={handleChange}
+                onChange={handlePincode}
                 required
                 id="outlined-required"
                 placeholder="Pin"
@@ -280,7 +288,8 @@ function PatientDashboard() {
               <TextField
                 required
                 variant="outlined"
-                value={age ? age + " years" : "age"}
+                value={age ? age + " years" : ageNum}
+                onChange={handleAge}
                 id="outlined-required"
                 placeholder="Age"
                 sx={{ width: "30%" }}

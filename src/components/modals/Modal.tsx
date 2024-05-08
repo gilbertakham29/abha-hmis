@@ -15,6 +15,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+
 import {
   generateMobileOtp,
   getAbhaCard,
@@ -36,6 +37,7 @@ import MobileOtpAlert from "../alerts/mobileOtpAlert";
 import VerifyMobileOtpAlert from "../alerts/verifyMobileOtp";
 import SuccessDialog from "./SuccessDialog";
 import { clearErrorMessage } from "../../redux/reducer";
+import ReCAPTCHA from "react-google-recaptcha";
 const style = {
   position: "absolute",
   top: "50%",
@@ -86,6 +88,8 @@ function ModalPopup({
   const [countdown, setCountdown] = useState(90);
   const [open, setOpen] = useState(false);
   const [isValidAadhaar, setIsValidAadhaar] = useState(true);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
+  const [isValid, setIsValid] = useState(true);
 
   const [scroll, setScroll] = useState<DialogProps["scroll"]>("paper");
   //const descriptionElementRef = React.useRef<HTMLElement>(null);
@@ -170,18 +174,14 @@ function ModalPopup({
   const mobileOtpError = useSelector(
     (state: RootState) => state.mobileOtpError
   );
+
   const searchPhoneNumber = async (searchMobile: string) => {
-    //const abhaId = await ;
     setSearchLoading(true);
-
-    // Handle submission or further processing
-    setLoading(true);
     setAadhaarError("");
-
-    setLoading(false);
 
     setTimeout(async () => {
       setSearchLoading(false);
+
       const result = await handleSearch(searchMobile, dispatch);
 
       const [abhaCard, abhaQr] = await Promise.all([
@@ -217,7 +217,19 @@ function ModalPopup({
     console.log(result);
   };
   const handlePhoneSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchMobile(e.target.value);
+    const inputValue = e.target.value;
+    setSearchMobile(inputValue);
+    //const abhaId = await ;
+
+    const mobileRegex = /^[6-9]\d{9}$/; // Mobile number regex (10 digits starting with 6-9)
+    const aadhaarRegex = /^\d{12}$/; // Aadhaar number regex (12 digits)
+
+    // Check if input value matches either mobile number or Aadhaar number regex
+    setIsValid(mobileRegex.test(inputValue) || aadhaarRegex.test(inputValue));
+    // Handle submission or further processing
+  };
+  const captchaChange = () => {
+    setCaptchaVerified(true);
   };
   const handleAadhaarOtpVerify = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue: string = e.target.value;
@@ -448,13 +460,37 @@ function ModalPopup({
               value={searchMobile}
               sx={{ width: "100%", backgroundColor: "#EEEEEE", mt: 2 }}
               placeholder="Enter AADHAAR/ABHA ID/MOBILE NO."
+              error={!isValid && searchMobile.trim().length > 0} // Show error if input is invalid
+              inputProps={{
+                style: { padding: "10px 14px" }, // Adjust padding for better appearance
+              }}
             />
+            {!isValid && searchMobile.trim().length > 0 && (
+              <Typography variant="caption" color="error" gutterBottom>
+                Please enter a valid mobile number or Aadhaar number.
+              </Typography>
+            )}
             {error && (
               <Typography sx={{ fontSize: "0.9rem", color: "red", mt: 1 }}>
                 {error}
               </Typography>
             )}
           </Box>
+          <Box
+            sx={{
+              display: "inline-flex",
+              justifyContent: "center",
+              alignItems: "center",
+              mx: 18,
+              mt: 1,
+            }}
+          >
+            <ReCAPTCHA
+              sitekey="6Le5ndUpAAAAAGYjjg7v2_E8pNsyhcbE4QRV-_S8"
+              onChange={captchaChange}
+            />
+          </Box>
+
           <Box
             sx={{
               display: "inline-flex",
@@ -467,7 +503,7 @@ function ModalPopup({
           >
             <LoadingButton
               loading={searchLoading}
-              disabled={searchLoading}
+              disabled={!captchaVerified}
               onClick={() => searchPhoneNumber(searchMobile)}
               variant="contained"
             >
