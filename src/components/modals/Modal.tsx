@@ -17,6 +17,7 @@ import {
 } from "@mui/material";
 
 import {
+  createHealthId,
   generateMobileOtp,
   getAbhaCard,
   getQrcode,
@@ -38,6 +39,7 @@ import VerifyMobileOtpAlert from "../alerts/verifyMobileOtp";
 import SuccessDialog from "./SuccessDialog";
 import { clearErrorMessage } from "../../redux/reducer";
 import ReCAPTCHA from "react-google-recaptcha";
+import React from "react";
 const style = {
   position: "absolute",
   top: "50%",
@@ -47,10 +49,11 @@ const style = {
   border: "2px solid #000",
   boxShadow: 24,
   px: 4,
+  py: 1,
   borderWidth: 1,
   borderRadius: 4,
   width: "50%",
-  py: 2,
+
   borderColor: "#BDBDBD",
 };
 function ModalPopup({
@@ -69,6 +72,7 @@ function ModalPopup({
   const [mobileOtpVerify, setMobileOtpVerify] = useState("");
   const [otpEntered, setOtpEntered] = useState(false);
   const [aadhaarInput, setAadhaarInput] = useState("");
+  const [aadhaarInputValue, setAadhaarInputValue] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
   const [btnShow, setBtnShow] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -79,7 +83,7 @@ function ModalPopup({
   const [mobileOtpAlert, setMobileOtpAlert] = useState(false);
   const [error, setError] = useState("");
   const [aadhaarError, setAadhaarError] = useState("");
-  const [healthIdCreate, setHealthIdCreate] = useState(false);
+  //const [healthIdCreate, setHealthIdCreate] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [checked, setChecked] = useState(false);
   const [email, setEmail] = useState("");
@@ -90,8 +94,27 @@ function ModalPopup({
   const [isValidAadhaar, setIsValidAadhaar] = useState(true);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [isValid, setIsValid] = useState(true);
-
+  const [openMobileInput, setOpenMobileInput] = useState(false);
   const [scroll, setScroll] = useState<DialogProps["scroll"]>("paper");
+  const [checkedItems, setCheckedItems] = useState<number[]>([]);
+  console.log(mobileOtp);
+
+  const handleToggle = (index: number) => {
+    const newCheckedItems = [...checkedItems];
+    if (newCheckedItems.includes(index)) {
+      newCheckedItems.splice(newCheckedItems.indexOf(index), 1);
+    } else {
+      newCheckedItems.push(index);
+    }
+    setCheckedItems(newCheckedItems);
+  };
+  const isAllChecked = [1, 2, 3, 4].every((index) =>
+    checkedItems.includes(index)
+  );
+  const handleOpenMobileInput = () => {
+    setBtnShow(false);
+    setOpenMobileInput(true);
+  };
   //const descriptionElementRef = React.useRef<HTMLElement>(null);
   const handleClickOpen = (scrollType: DialogProps["scroll"]) => () => {
     setOpen(true);
@@ -157,11 +180,15 @@ function ModalPopup({
   const searchResult = useSelector((state: RootState) => state.searchResult);
   console.log(searchResult);
   const errorMessage = useSelector((state: RootState) => state.errorMessage);
+  console.log(errorMessage.message);
+
   const otpMessage = useSelector((state: RootState) => state.otpSuccess);
   console.log(otpMessage.message);
   const mobileNumberSuccess = useSelector(
     (state: RootState) => state.mobileNumberSuccess
   );
+  console.log(mobileNumberSuccess);
+
   const mobileNumberError = useSelector(
     (state: RootState) => state.mobileNumberError
   );
@@ -196,16 +223,18 @@ function ModalPopup({
   };
   useEffect(() => {
     let timer: string | number | NodeJS.Timeout | undefined;
-    if (countdown > 0) {
-      timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-    } else {
-      setShowButton(true);
+    if (aadhaarOtpInput) {
+      if (countdown > 0) {
+        timer = setTimeout(() => {
+          setCountdown(countdown - 1);
+        }, 1000);
+      } else {
+        setShowButton(true);
+      }
     }
 
     return () => clearTimeout(timer);
-  }, [countdown]);
+  }, [countdown, aadhaarOtpInput]);
 
   const handleResend = async (aadhaarInput: string) => {
     if (resendCount < 2) {
@@ -223,9 +252,14 @@ function ModalPopup({
 
     const mobileRegex = /^[6-9]\d{9}$/; // Mobile number regex (10 digits starting with 6-9)
     const aadhaarRegex = /^\d{12}$/; // Aadhaar number regex (12 digits)
+    const abhaNumberRegex = /^\d{2}-\d{4}-\d{4}-\d{4}$/;
 
     // Check if input value matches either mobile number or Aadhaar number regex
-    setIsValid(mobileRegex.test(inputValue) || aadhaarRegex.test(inputValue));
+    setIsValid(
+      mobileRegex.test(inputValue) ||
+        aadhaarRegex.test(inputValue) ||
+        abhaNumberRegex.test(inputValue)
+    );
     // Handle submission or further processing
   };
   const captchaChange = () => {
@@ -288,7 +322,11 @@ function ModalPopup({
 
   const handleMobile = async (aadhharOtp: number) => {
     setLoading(true);
-    const result = await verifyAadhaarOtp(aadhaarInput, aadhharOtp, dispatch);
+    const result = await verifyAadhaarOtp(
+      aadhaarInputValue,
+      aadhharOtp,
+      dispatch
+    );
 
     setTimeout(() => {
       setLoading(false);
@@ -309,6 +347,7 @@ function ModalPopup({
 
     console.log(result);
   };
+  console.log(handleMobile);
 
   const handleMobileOtpGenerate = async (
     aadhaarInput: string,
@@ -320,18 +359,17 @@ function ModalPopup({
     setTimeout(() => {
       if (mobileNumberSuccess.message) {
         dispatch(clearErrorMessage());
-
-        setMobileAlert(true);
-        setMobileNumber(false);
+        setOpenMobileInput(false);
         setTimeout(() => {
-          setMobileNumber(false);
           setMobileOtp(true);
-
+          setOpenMobileInput(false);
+          setMobileOtp(true);
           setMobileAlert(false);
         }, 3000);
       }
     }, 2000);
     setLoading(false);
+
     console.log(result);
   };
   const mobileOtpVerification = async (
@@ -344,16 +382,15 @@ function ModalPopup({
 
     setTimeout(() => {
       setLoading(false);
-      if (mobileNumberSuccess.message) {
-        dispatch(clearErrorMessage());
+
+      if (mobileOtpSuccess.message) {
         setMobileOtpAlert(true);
         setMobileOtp(false);
-
+        setMobileNumber(true);
         setTimeout(() => {
           setMobileOtp(false);
 
           setMobileOtpAlert(false);
-          setHealthIdCreate(true);
         }, 3000);
       }
     }, 2000);
@@ -388,15 +425,27 @@ function ModalPopup({
   };
   const handleAdhaarInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     let aadhaarValue = e.target.value;
-    aadhaarValue = aadhaarValue.substring(0, 12);
-    setAadhaarInput(aadhaarValue);
 
+    // Apply masking to the Aadhaar number if it has more than 12 characters
+    if (aadhaarValue.length > 12) {
+      aadhaarValue = aadhaarValue.substring(0, 12);
+    }
+
+    // Mask the Aadhaar number using regex pattern
+    const maskedValue = aadhaarValue.replace(
+      /^([2-9]{1}[0-9]{3})[0-9]{4}([0-9]{4})$/,
+      "************"
+    );
+
+    setAadhaarInput(maskedValue);
+    setAadhaarInputValue(aadhaarValue);
     const aadhaarRegex = /^[2-9]{1}[0-9]{3}[0-9]{4}[0-9]{4}$/;
 
     // Check if the entered Aadhaar number matches the pattern
     const isValid = aadhaarRegex.test(aadhaarValue);
     setIsValidAadhaar(isValid);
   };
+
   const handleClose = () => {
     setOpenDialog(false);
   };
@@ -411,6 +460,20 @@ function ModalPopup({
   const handleDisagree = () => {
     setChecked(false);
     setOpen(false);
+  };
+  const createHealthIdOtp = async (
+    aadhaarInput: string,
+    aadhharOtp: number
+  ) => {
+    setLoading(true);
+    const result = await createHealthId(aadhaarInput, aadhharOtp, dispatch);
+    console.log(result);
+    setTimeout(() => {
+      setLoading(false);
+
+      setAadhaarOtpInput(false);
+      setMobileNumber(true);
+    }, 2000);
   };
   return (
     <div>
@@ -428,6 +491,7 @@ function ModalPopup({
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
+                mt: 1,
               }}
             >
               <Typography
@@ -452,7 +516,6 @@ function ModalPopup({
                 border: "1px solid #000",
                 borderBottom: 1,
                 borderColor: "#BDBDBD",
-                mt: 2,
               }}
             ></Box>
             <OutlinedInput
@@ -465,9 +528,10 @@ function ModalPopup({
                 style: { padding: "10px 14px" }, // Adjust padding for better appearance
               }}
             />
+
             {!isValid && searchMobile.trim().length > 0 && (
               <Typography variant="caption" color="error" gutterBottom>
-                Please enter a valid mobile number or Aadhaar number.
+                Please enter a valid Mobile number or Aadhaar number or ABHA ID.
               </Typography>
             )}
             {error && (
@@ -476,6 +540,7 @@ function ModalPopup({
               </Typography>
             )}
           </Box>
+
           <Box
             sx={{
               display: "inline-flex",
@@ -512,19 +577,6 @@ function ModalPopup({
             <Button variant="outlined">Reset</Button>
           </Box>
 
-          <Box
-            sx={{
-              display: "inline-flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mx: 34,
-              mt: 2,
-            }}
-          >
-            <Typography variant="h5" sx={{ fontSize: "1.2rem" }}>
-              Or
-            </Typography>
-          </Box>
           <Box>
             <Typography
               variant="h5"
@@ -573,6 +625,22 @@ function ModalPopup({
                   read more
                 </Typography>
               </Button>
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  justifyContent: "flex-end",
+                  alignItems: "flex-start",
+                }}
+              >
+                <Button onClick={handleOpenMobileInput}>
+                  <Typography
+                    variant="h5"
+                    sx={{ fontSize: "0.7rem", color: "#424242" }}
+                  >
+                    New number?
+                  </Typography>
+                </Button>
+              </Box>
               <Dialog
                 open={open}
                 scroll={scroll}
@@ -589,33 +657,86 @@ function ModalPopup({
                     id="alert-dialog-description"
                     tabIndex={-1}
                   >
-                    {[...new Array(1)]
-                      .map(
-                        () => `I hereby declare that:
-                        I am voluntarily sharing my Aadhaar Number / Virtual ID issued by the Unique Identification Authority of India (“UIDAI”), and my demographic information for the purpose of
-                        creating an Ayushman Bharat Health Account number (“ABHA number”) and Ayushman Bharat Health Account address (“ABHA Address”). I authorize NHA to use my Aadhaar
-                        number / Virtual ID for performing Aadhaar based authentication with UIDAI as per the provisions of the Aadhaar (Targeted Delivery of Financial and other Subsidies, Benefits and
-                        Services) Act, 2016 for the aforesaid purpose. I understand that UIDAI will share my e-KYC details, or response of “Yes” with NHA upon successful authentication.
-                        
-                        I consent to usage of my ABHA address and ABHA number for linking of my legacy (past) government health records and those which will be generated during this encounter.
-
-                        I authorize the sharing of all my health records with healthcare provider(s) for the purpose of providing healthcare services to me during this encounter.
-
-                        I consent to the anonymization and subsequent use of my government health records for public health purposes.
-I, confirm that I have duly informed and explained the beneficiary of the contents of
-consent for aforementioned purposes.
-
-
-I, have been explained about the consent as stated above and hereby provide my consent for the aforementioned purposes.
-
-                        `
-                      )
-                      .join("\n")}
+                    {[...new Array(1)].map((_, index) => (
+                      <React.Fragment key={index}>
+                        <Checkbox
+                          checked={checkedItems.includes(index)}
+                          onChange={() => handleToggle(index)}
+                          color="primary"
+                        />
+                        I hereby declare that: <br />
+                        {/* Add your consent content here */}
+                        <ul>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 1)}
+                              onChange={() => handleToggle(index + 1)}
+                              color="primary"
+                            />
+                            I am voluntarily sharing my Aadhaar Number / Virtual
+                            ID issued by the Unique Identification Authority of
+                            India (“UIDAI”), and my demographic information for
+                            the purpose of creating an Ayushman Bharat Health
+                            Account number (“ABHA number”) and Ayushman Bharat
+                            Health Account address (“ABHA Address”). I authorize
+                            NHA to use my Aadhaar number / Virtual ID for
+                            performing Aadhaar based authentication with UIDAI
+                            as per the provisions of the Aadhaar (Targeted
+                            Delivery of Financial and other Subsidies, Benefits
+                            and Services) Act, 2016 for the aforesaid purpose. I
+                            understand that UIDAI will share my e-KYC details,
+                            or response of “Yes” with NHA upon successful
+                            authentication.
+                          </li>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 2)}
+                              onChange={() => handleToggle(index + 2)}
+                              color="primary"
+                            />
+                            I consent to usage of my ABHA address and ABHA
+                            number for linking of my legacy (past) government
+                            health records and those which will be generated
+                            during this encounter.
+                          </li>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 3)}
+                              onChange={() => handleToggle(index + 3)}
+                              color="primary"
+                            />
+                            I authorize the sharing of all my health records
+                            with healthcare provider(s) for the purpose of
+                            providing healthcare services to me during this
+                            encounter.
+                          </li>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 4)}
+                              onChange={() => handleToggle(index + 4)}
+                              color="primary"
+                            />
+                            I consent to the anonymization and subsequent use of
+                            my government health records for public health
+                            purposes. I,(abdmadmin@picasoid.co.in), confirm that
+                            I have duly informed and explained the beneficiary
+                            of the contents of consent for aforementioned
+                            purposes. I, have been explained about the consent
+                            as stated above and hereby provide my consent for
+                            the aforementioned purposes.
+                          </li>
+                        </ul>
+                      </React.Fragment>
+                    ))}
                   </DialogContentText>
                 </DialogContent>
                 <DialogActions>
                   <Button onClick={handleDisagree}>Disagree</Button>
-                  <Button onClick={handleAgree} autoFocus>
+                  <Button
+                    onClick={handleAgree}
+                    autoFocus
+                    disabled={!isAllChecked}
+                  >
                     Agree
                   </Button>
                 </DialogActions>
@@ -665,7 +786,12 @@ I, have been explained about the consent as stated above and hereby provide my c
                     variant="contained"
                     disabled={loading}
                     loading={loading}
-                    onClick={() => handleMobile(Number(aadhharOtpVerfiy))}
+                    onClick={() =>
+                      createHealthIdOtp(
+                        aadhaarInputValue,
+                        Number(aadhharOtpVerfiy)
+                      )
+                    }
                   >
                     Verify
                   </LoadingButton>
@@ -681,7 +807,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                   <>
                     <Button
                       variant="outlined"
-                      onClick={() => handleResend(aadhaarInput)}
+                      onClick={() => handleResend(aadhaarInputValue)}
                     >
                       Resend Otp
                     </Button>
@@ -691,8 +817,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                 )}
               </Box>
             )}
-
-            {mobileNumber && (
+            {openMobileInput && !mobileNumberSuccess.message && (
               <Box
                 sx={{
                   display: "flex",
@@ -720,7 +845,60 @@ I, have been explained about the consent as stated above and hereby provide my c
                   />
                   <LoadingButton
                     onClick={() =>
-                      handleMobileOtpGenerate(aadhaarInput, Number(mobileInput))
+                      handleMobileOtpGenerate(
+                        aadhaarInputValue,
+                        Number(mobileInput)
+                      )
+                    }
+                    variant="contained"
+                    disabled={loading}
+                    loading={loading}
+                  >
+                    Enter
+                  </LoadingButton>
+                </Box>
+                {
+                  <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
+                    {mobileNumberError &&
+                      mobileNumberError.message &&
+                      mobileNumberError.message}
+                  </Typography>
+                }
+              </Box>
+            )}
+
+            {/*mobileNumber && (
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 2,
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                }}
+              >
+                <Typography>Enter your mobile number.</Typography>
+                <Box
+                  sx={{
+                    display: "inline-flex",
+                    gap: 2,
+
+                    justifyContent: "flex-start",
+                    alignItems: "center",
+                  }}
+                >
+                  <TextField
+                    label="Mobile No."
+                    placeholder="Enter Mobile Number here..."
+                    value={mobileInput}
+                    onChange={handleMobileSubmit}
+                  />
+                  <LoadingButton
+                    onClick={() =>
+                      handleMobileOtpGenerate(
+                        aadhaarInputValue,
+                        Number(mobileInput)
+                      )
                     }
                     variant="contained"
                     disabled={loading}
@@ -759,7 +937,10 @@ I, have been explained about the consent as stated above and hereby provide my c
                   />
                   <LoadingButton
                     onClick={() =>
-                      handleMobileOtpGenerate(aadhaarInput, Number(mobileInput))
+                      handleMobileOtpGenerate(
+                        aadhaarInputValue,
+                        Number(mobileInput)
+                      )
                     }
                     variant="contained"
                     disabled={loading}
@@ -788,7 +969,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                 }}
               >
                 <Typography sx={{ mr: 14 }}>
-                  Enter the OTP sent to your mobile and click verify.
+                  Enter the OTP sent to your mobile.
                 </Typography>
                 <Box
                   sx={{
@@ -819,7 +1000,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                     loading={loading}
                     onClick={() =>
                       mobileOtpVerification(
-                        aadhaarInput,
+                        aadhaarInputValue,
                         Number(mobileOtpVerify)
                       )
                     }
@@ -872,7 +1053,67 @@ I, have been explained about the consent as stated above and hereby provide my c
                     loading={loading}
                     onClick={() =>
                       mobileOtpVerification(
-                        aadhaarInput,
+                        aadhaarInputValue,
+                        Number(mobileOtpVerify)
+                      )
+                    }
+                    type="submit"
+                  >
+                    Verify
+                  </LoadingButton>
+                </Box>
+                {
+                  <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
+                    {mobileOtpError &&
+                      mobileOtpError.message &&
+                      mobileOtpError.message}
+                  </Typography>
+                }
+              </Box>
+            )*/}
+            {mobileNumberSuccess.message && !mobileOtpSuccess.message && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  gap: 2,
+                }}
+              >
+                <Typography sx={{ mr: 14 }}>
+                  Enter the OTP sent to your mobile and click verify.
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: 2,
+                    mr: 14,
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <TextField
+                    label="Mobile OTP"
+                    placeholder="Enter Mobile Otp here..."
+                    value={mobileOtpVerify}
+                    onChange={handleMobileOtpVerify}
+                  />
+
+                  <LoadingButton
+                    sx={{
+                      my: 1,
+                      backgroundColor: "#00E676",
+                      ":hover": { backgroundColor: "#00C853" },
+                    }}
+                    variant="contained"
+                    size="small"
+                    disabled={!otpEntered}
+                    loading={loading}
+                    onClick={() =>
+                      mobileOtpVerification(
+                        aadhaarInputValue,
                         Number(mobileOtpVerify)
                       )
                     }
@@ -890,8 +1131,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                 }
               </Box>
             )}
-
-            {healthIdCreate && mobileOtpSuccess.message && (
+            {mobileNumber && (
               <Box
                 sx={{
                   display: "flex",
@@ -903,7 +1143,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                 }}
               >
                 <TextField
-                  label="Email"
+                  label="ABHA Address"
                   value={email}
                   onChange={handleEmailChange}
                 />
@@ -920,7 +1160,7 @@ I, have been explained about the consent as stated above and hereby provide my c
                   size="small"
                   loading={loading}
                   onClick={() =>
-                    generateHealthIdPreVerified(aadhaarInput, email)
+                    generateHealthIdPreVerified(aadhaarInputValue, email)
                   }
                   type="submit"
                 >
@@ -928,13 +1168,49 @@ I, have been explained about the consent as stated above and hereby provide my c
                 </LoadingButton>
               </Box>
             )}
-
+            {mobileOtpSuccess.message && (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "flex-start",
+                  alignItems: "center",
+                  gap: 1,
+                  mx: 8,
+                }}
+              >
+                <TextField
+                  label="ABHA Address"
+                  value={email}
+                  onChange={handleEmailChange}
+                />
+                <Typography sx={{ fontSize: "0.7rem", color: "red" }}>
+                  This will be ABHA address
+                </Typography>
+                <LoadingButton
+                  sx={{
+                    my: 1,
+                    backgroundColor: "#00E676",
+                    ":hover": { backgroundColor: "#00C853" },
+                  }}
+                  variant="contained"
+                  size="small"
+                  loading={loading}
+                  onClick={() =>
+                    generateHealthIdPreVerified(aadhaarInputValue, email)
+                  }
+                  type="submit"
+                >
+                  Enter
+                </LoadingButton>
+              </Box>
+            )}
             {btnShow && (
               <LoadingButton
                 variant="contained"
                 disabled={!checked || loading}
                 loading={loading}
-                onClick={() => handleSubmit(aadhaarInput)}
+                onClick={() => handleSubmit(aadhaarInputValue)}
                 sx={{ borderRadius: 2, px: 4, py: 1, mx: 14 }}
               >
                 Submit

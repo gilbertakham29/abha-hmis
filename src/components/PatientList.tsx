@@ -15,7 +15,7 @@ import {
   TableRow,
   TextField,
 } from "@mui/material";
-
+import { format } from "date-fns";
 import { SelectChangeEvent } from "@mui/material";
 import { useEffect, useState } from "react";
 import { fetchPatientList } from "../api/abha-api";
@@ -319,6 +319,12 @@ function PatientList() {
                   align="center"
                   sx={{ fontSize: 12, fontWeight: "bold" }}
                 >
+                  DOB
+                </TableCell>
+                <TableCell
+                  align="center"
+                  sx={{ fontSize: 12, fontWeight: "bold" }}
+                >
                   GENDER
                 </TableCell>
                 <TableCell
@@ -372,36 +378,85 @@ function PatientList() {
                   {showTable && (
                     <TableBody>
                       <TableRow>
-                        <TableCell align="center" component="th" scope="row">
+                        <TableCell
+                          align="center"
+                          component="th"
+                          scope="row"
+                          sx={{ width: "10%" }}
+                        >
                           {patient.patientId}
                         </TableCell>
-                        <TableCell align="center">{patient.uhid}</TableCell>
-                        <TableCell align="center">
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {patient.uhid}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ width: "20%", fontSize: "0.7rem" }}
+                        >
                           {patient.patientName}
                         </TableCell>
-                        <TableCell align="center">{patient.gender}</TableCell>
-                        <TableCell align="center">{patient.age}</TableCell>
-                        <TableCell align="center">
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {format(patient.dob, "dd/MM/yyyy")}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {patient.gender}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {patient.age}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ width: "15%", fontSize: "0.7rem" }}
+                        >
                           {patient.contactNumber}
                         </TableCell>
-                        <TableCell align="center">
+                        <TableCell
+                          align="center"
+                          sx={{ width: "15%", fontSize: "0.7rem" }}
+                        >
                           {patient.permanentAddress}
                         </TableCell>
-                        <TableCell align="center">
-                          {patient.addedDate}
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {format(patient.addedDate, "dd/MM/yyyy")}
                         </TableCell>
-                        <TableCell align="center">{patient.abhaId}</TableCell>
-                        <TableCell align="center">
+                        <TableCell
+                          align="center"
+                          sx={{ width: "10%", fontSize: "0.7rem" }}
+                        >
+                          {patient.abhaId}
+                        </TableCell>
+                        <TableCell
+                          align="center"
+                          sx={{ width: "15%", fontSize: "0.7rem" }}
+                        >
                           {patient.abhaAddress}
                         </TableCell>
-
                         <TableCell>
                           {patient.isAbhaCreated ? (
                             <Button
                               variant="contained"
                               size="small"
                               disabled
-                              sx={{ fontSize: "0.6rem", height: 42 }}
+                              sx={{
+                                fontSize: "0.6rem",
+                                height: 42,
+                                width: "10%",
+                              }} // Adjust the width as needed
                             >
                               CREATE ABHA
                             </Button>
@@ -410,7 +465,11 @@ function PatientList() {
                               variant="contained"
                               size="small"
                               onClick={handleModal}
-                              sx={{ fontSize: "0.6rem", height: 42 }}
+                              sx={{
+                                fontSize: "0.6rem",
+                                height: 42,
+                                width: "10%",
+                              }} // Adjust the width as needed
                             >
                               CREATE ABHA
                             </Button>
