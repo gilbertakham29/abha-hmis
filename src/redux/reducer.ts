@@ -8,7 +8,9 @@ export interface ConsentHeaders {
   fetchToDate: string;
   permissionExpiryDate: string;
 }
-
+export interface InitAuth {
+  txnId: string;
+}
 export interface HealthInfoData {
   healthInformationTypeId: number;
   code: string;
@@ -69,6 +71,7 @@ export interface AbhaCardList {
 }
 interface State {
   searchResult: DemographicResult;
+  initAuthResult: InitAuth;
   patientResult: PatientResult;
   patientList: PatientListData[];
   abhaCardResult: string;
@@ -104,6 +107,9 @@ const initialState: State = {
     mobile: "",
     healthIdNumber: "",
     healthId: "",
+  },
+  initAuthResult: {
+    txnId: "",
   },
   patientResult: {
     name: "",
@@ -179,6 +185,9 @@ const rootReducerSlice = createSlice({
   reducers: {
     setSearchResult(state, action: PayloadAction<DemographicResult>) {
       state.searchResult = action.payload;
+    },
+    setInitAuth(state, action: PayloadAction<InitAuth>) {
+      state.initAuthResult = action.payload;
     },
     setPatientResult(state, action: PayloadAction<PatientResult>) {
       state.patientResult = action.payload;
@@ -267,6 +276,7 @@ const rootReducerSlice = createSlice({
 
 export const {
   setSearchResult,
+  setInitAuth,
   setPatientResult,
   getPatientList,
   getAbhaCardResult,

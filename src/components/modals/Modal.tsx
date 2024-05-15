@@ -9,20 +9,26 @@ import {
   DialogContentText,
   DialogProps,
   DialogTitle,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Modal,
   OutlinedInput,
   TextField,
   Typography,
 } from "@mui/material";
-
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import {
+  confirmAadhaarAuth,
+  confirmMobileAuth,
   createHealthId,
   generateMobileOtp,
   getAbhaCard,
   getQrcode,
   handleSearch,
   initAbhaRegistration,
+  initAuth,
   resendOtp,
   verifyAadhaarOtp,
   verifyMobileOtp,
@@ -97,6 +103,15 @@ function ModalPopup({
   const [openMobileInput, setOpenMobileInput] = useState(false);
   const [scroll, setScroll] = useState<DialogProps["scroll"]>("paper");
   const [checkedItems, setCheckedItems] = useState<number[]>([]);
+  const [verifyBy, setVerifyBy] = useState("");
+  const [aadhaarAuth, setAadhaarAuthVerify] = useState("");
+  const [mobileAuth, setMobileAuthVerify] = useState("");
+  const [searchEnabled, setSearchEnabled] = useState(false);
+  const handleChangeOTP = (event: SelectChangeEvent) => {
+    setVerifyBy(event.target.value as string);
+    setOtpEntered(!!event.target.value);
+  };
+
   console.log(mobileOtp);
 
   const handleToggle = (index: number) => {
@@ -135,6 +150,7 @@ function ModalPopup({
     setOpen(false);
   };
   const dispatch = useDispatch();
+
   type getDemographicsResult = {
     name: string;
     pinCode: string;
@@ -167,6 +183,9 @@ function ModalPopup({
   type mobileOtpErrorType = {
     message: string;
   };
+  type initAuthResultData = {
+    txnId: string;
+  };
   type RootState = {
     searchResult: getDemographicsResult;
     errorMessage: otpErrorType;
@@ -175,7 +194,12 @@ function ModalPopup({
     mobileNumberError: mobileErrorType;
     mobileOtpSuccess: mobileOtpSuccessType;
     mobileOtpError: mobileOtpErrorType;
+    initAuthResult: initAuthResultData;
   };
+  const initAuthResult = useSelector(
+    (state: RootState) => state.initAuthResult
+  );
+  console.log(initAuthResult.txnId);
 
   const searchResult = useSelector((state: RootState) => state.searchResult);
   console.log(searchResult);
@@ -253,12 +277,13 @@ function ModalPopup({
     const mobileRegex = /^[6-9]\d{9}$/; // Mobile number regex (10 digits starting with 6-9)
     const aadhaarRegex = /^\d{12}$/; // Aadhaar number regex (12 digits)
     const abhaNumberRegex = /^\d{2}-\d{4}-\d{4}-\d{4}$/;
-
+    const abhaIDRegex = /.*@sbx.*/;
     // Check if input value matches either mobile number or Aadhaar number regex
     setIsValid(
       mobileRegex.test(inputValue) ||
         aadhaarRegex.test(inputValue) ||
-        abhaNumberRegex.test(inputValue)
+        abhaNumberRegex.test(inputValue) ||
+        abhaIDRegex.test(inputValue)
     );
     // Handle submission or further processing
   };
@@ -275,6 +300,20 @@ function ModalPopup({
     const newValue: string = e.target.value;
     if (!isNaN(Number(newValue))) {
       setMobileOtpVerify(newValue);
+    }
+    setOtpEntered(e.target.value !== "" ? true : false);
+  };
+  const handleAadhaarAuthVerfiy = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue: string = e.target.value;
+    if (!isNaN(Number(newValue))) {
+      setAadhaarAuthVerify(newValue);
+    }
+    setOtpEntered(e.target.value !== "" ? true : false);
+  };
+  const handleMobileAuthVerfiy = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue: string = e.target.value;
+    if (!isNaN(Number(newValue))) {
+      setMobileAuthVerify(newValue);
     }
     setOtpEntered(e.target.value !== "" ? true : false);
   };
@@ -475,6 +514,35 @@ function ModalPopup({
       setMobileNumber(true);
     }, 2000);
   };
+  const handleInitAuth = async (
+    authMethodInput: string,
+    healthIdInput: string
+  ) => {
+    setLoading(true);
+    const result = await initAuth(authMethodInput, healthIdInput, dispatch);
+    console.log(result);
+    setTimeout(() => {
+      setLoading(false);
+    });
+  };
+  const handleAadhaarAuth = () => {
+    confirmAadhaarAuth(initAuthResult.txnId, Number(aadhaarAuth));
+    setMobileOtpAlert(true);
+    setTimeout(() => {
+      setMobileOtpAlert(false);
+      setSearchEnabled(true);
+    }, 2000);
+  };
+  const handleMobileAuth = () => {
+    confirmMobileAuth(initAuthResult.txnId, Number(mobileAuth));
+    setMobileOtpAlert(true);
+
+    setTimeout(() => {
+      setMobileOtpAlert(false);
+      setSearchEnabled(true);
+    }, 2000);
+  };
+
   return (
     <div>
       <Modal
@@ -499,7 +567,7 @@ function ModalPopup({
                 component="h5"
                 sx={{ fontSize: "1.3rem" }}
               >
-                Search By Aadhaar or Abha Id
+                Search By Abha ID or Abha Address
               </Typography>
               <IconButton
                 edge="start"
@@ -522,7 +590,7 @@ function ModalPopup({
               onChange={handlePhoneSearch}
               value={searchMobile}
               sx={{ width: "100%", backgroundColor: "#EEEEEE", mt: 2 }}
-              placeholder="Enter AADHAAR/ABHA ID/MOBILE NO."
+              placeholder="Enter ABHA ID/ABHA ADDRESS"
               error={!isValid && searchMobile.trim().length > 0} // Show error if input is invalid
               inputProps={{
                 style: { padding: "10px 14px" }, // Adjust padding for better appearance
@@ -540,6 +608,99 @@ function ModalPopup({
               </Typography>
             )}
           </Box>
+          <FormControl
+            fullWidth
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "center",
+              mx: 14,
+              gap: 1,
+              mt: 1,
+            }}
+          >
+            <InputLabel id="verify-by-label">Choose...</InputLabel>
+            <Select
+              label="Choose..."
+              sx={{ height: 50, width: "50%" }}
+              value={verifyBy}
+              onChange={handleChangeOTP}
+            >
+              <MenuItem value="MOBILE_OTP">Verify by using Mobile OTP</MenuItem>
+              <MenuItem value="AADHAAR_OTP">
+                Verify by using Aadhaar OTP
+              </MenuItem>
+            </Select>
+            <LoadingButton
+              variant="outlined"
+              loading={loading}
+              disabled={loading}
+              onClick={() => handleInitAuth(verifyBy, searchMobile)}
+            >
+              Confirm
+            </LoadingButton>
+          </FormControl>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 2,
+              mt: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {verifyBy === "MOBILE_OTP" && (
+              <>
+                <TextField
+                  label="Mobile OTP"
+                  placeholder="Enter Mobile Otp here..."
+                  value={mobileAuth}
+                  onChange={handleMobileAuthVerfiy}
+                />
+                <LoadingButton
+                  sx={{
+                    backgroundColor: "#00E676",
+                    ":hover": { backgroundColor: "#00C853" },
+                  }}
+                  variant="contained"
+                  size="small"
+                  disabled={!otpEntered}
+                  loading={false}
+                  type="submit"
+                  onClick={handleMobileAuth}
+                >
+                  Verify
+                </LoadingButton>
+              </>
+            )}
+
+            {verifyBy === "AADHAAR_OTP" && (
+              <>
+                <TextField
+                  label="Aadhaar OTP"
+                  placeholder="Enter Aadhaar Otp here..."
+                  value={aadhaarAuth}
+                  onChange={handleAadhaarAuthVerfiy}
+                />
+                <LoadingButton
+                  sx={{
+                    backgroundColor: "#00E676",
+                    ":hover": { backgroundColor: "#00C853" },
+                  }}
+                  variant="contained"
+                  size="small"
+                  disabled={!otpEntered}
+                  loading={false}
+                  type="submit"
+                  onClick={handleAadhaarAuth}
+                >
+                  Verify
+                </LoadingButton>
+              </>
+            )}
+          </Box>
 
           <Box
             sx={{
@@ -550,32 +711,35 @@ function ModalPopup({
               mt: 1,
             }}
           >
-            <ReCAPTCHA
-              sitekey="6Le5ndUpAAAAAGYjjg7v2_E8pNsyhcbE4QRV-_S8"
-              onChange={captchaChange}
-            />
+            {searchEnabled && (
+              <ReCAPTCHA
+                sitekey="6Le5ndUpAAAAAGYjjg7v2_E8pNsyhcbE4QRV-_S8"
+                onChange={captchaChange}
+              />
+            )}
           </Box>
-
-          <Box
-            sx={{
-              display: "inline-flex",
-              justifyContent: "center",
-              alignItems: "center",
-              mt: 2,
-              mx: 28,
-              gap: 2,
-            }}
-          >
-            <LoadingButton
-              loading={searchLoading}
-              disabled={!captchaVerified}
-              onClick={() => searchPhoneNumber(searchMobile)}
-              variant="contained"
+          {searchEnabled && (
+            <Box
+              sx={{
+                display: "inline-flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: 2,
+                mx: 28,
+                gap: 2,
+              }}
             >
-              Search
-            </LoadingButton>
-            <Button variant="outlined">Reset</Button>
-          </Box>
+              <LoadingButton
+                loading={searchLoading}
+                disabled={!captchaVerified}
+                onClick={() => searchPhoneNumber(searchMobile)}
+                variant="contained"
+              >
+                Search
+              </LoadingButton>
+              <Button variant="outlined">Reset</Button>
+            </Box>
+          )}
 
           <Box>
             <Typography

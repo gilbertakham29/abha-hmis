@@ -1,5 +1,6 @@
 import {
   getAbhaCardResult,
+  setInitAuth,
   getAbhaQrCode,
   setSearchResult,
   setPatientResult,
@@ -571,5 +572,72 @@ export const fetchPatientList = async (dispatch: AppDispatch) => {
   );
   const result = await response.json();
   dispatch(getPatientList(result));
+  console.log(result);
+};
+// these are the api for authentication in search
+export const initAuth = async (
+  authMethodInput: string,
+  healthIdInput: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    authMethod: authMethodInput,
+    healthid: healthIdInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/InitAuth",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  console.log(result);
+
+  dispatch(setInitAuth(result));
+};
+export const confirmMobileAuth = async (
+  txnIdInput: string,
+  otpInput: number
+) => {
+  const data = {
+    txnId: txnIdInput,
+    otp: otpInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/ConfirmMobileAuth",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
+  console.log(result);
+};
+export const confirmAadhaarAuth = async (
+  txnIdInput: string,
+  otpInput: number
+) => {
+  const data = {
+    txnId: txnIdInput,
+    otp: otpInput,
+  };
+  const response = await fetch(
+    "https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/ConfirmAadharAuth",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  const result = await response.json();
   console.log(result);
 };

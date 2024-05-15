@@ -2,6 +2,10 @@ export const setSearchResult = (result: object) => ({
   type: "SET_SEARCH_RESULT",
   payload: result,
 });
+export const setInitAuth = (result: object) => ({
+  type: "SET_INIT_AUTH",
+  payload: result,
+});
 export const setPatientResult = (result: object) => ({
   type: "SET_PATIENT_RESULT",
   payload: result,
