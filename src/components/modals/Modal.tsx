@@ -107,6 +107,12 @@ function ModalPopup({
   const [aadhaarAuth, setAadhaarAuthVerify] = useState("");
   const [mobileAuth, setMobileAuthVerify] = useState("");
   const [searchEnabled, setSearchEnabled] = useState(false);
+  const [healthIdLoading, setHealthIdLoading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [errorOtp, setErrorOtp] = useState("");
+  const [mobileAuthError, setMobileAuthError] = useState("");
+  const [aadhaarAuthError, setAadhaarAuthError] = useState("");
+
   const handleChangeOTP = (event: SelectChangeEvent) => {
     setVerifyBy(event.target.value as string);
     setOtpEntered(!!event.target.value);
@@ -439,7 +445,7 @@ function ModalPopup({
     aadhaarInput: string,
     abhaAddressInput: string
   ) => {
-    setLoading(true);
+    setHealthIdLoading(true);
     const result = await verifyOtpandCreateHealthId(
       aadhaarInput,
       abhaAddressInput,
@@ -447,7 +453,7 @@ function ModalPopup({
     );
 
     setTimeout(async () => {
-      setLoading(false);
+      setHealthIdLoading(false);
       setOpenDialog(true);
       const result = await handleSearch(aadhaarInput, dispatch);
 
@@ -504,11 +510,11 @@ function ModalPopup({
     aadhaarInput: string,
     aadhharOtp: number
   ) => {
-    setLoading(true);
+    setHealthIdLoading(true);
     const result = await createHealthId(aadhaarInput, aadhharOtp, dispatch);
     console.log(result);
     setTimeout(() => {
-      setLoading(false);
+      setHealthIdLoading(false);
 
       setAadhaarOtpInput(false);
       setMobileNumber(true);
@@ -518,31 +524,64 @@ function ModalPopup({
     authMethodInput: string,
     healthIdInput: string
   ) => {
-    setLoading(true);
+    setConfirmLoading(true);
     const result = await initAuth(authMethodInput, healthIdInput, dispatch);
     console.log(result);
     setTimeout(() => {
-      setLoading(false);
+      setConfirmLoading(false);
     });
   };
-  const handleAadhaarAuth = () => {
-    confirmAadhaarAuth(initAuthResult.txnId, Number(aadhaarAuth));
-    setMobileOtpAlert(true);
-    setTimeout(() => {
-      setMobileOtpAlert(false);
-      setSearchEnabled(true);
-    }, 2000);
-  };
-  const handleMobileAuth = () => {
-    confirmMobileAuth(initAuthResult.txnId, Number(mobileAuth));
-    setMobileOtpAlert(true);
+  const handleAadhaarAuth = async () => {
+    try {
+      await confirmAadhaarAuth(initAuthResult.txnId, Number(aadhaarAuth));
+      setMobileOtpAlert(true);
 
-    setTimeout(() => {
-      setMobileOtpAlert(false);
       setSearchEnabled(true);
-    }, 2000);
+    } catch (err) {
+      if (err instanceof Error) {
+        setAadhaarAuthError("Invalid OTP");
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setMobileOtpAlert(false);
+    }
   };
+  const handleMobileAuth = async () => {
+    try {
+      await confirmMobileAuth(initAuthResult.txnId, Number(mobileAuth));
+      setMobileOtpAlert(true);
 
+      setSearchEnabled(true);
+    } catch (err) {
+      if (err instanceof Error) {
+        setMobileAuthError("Invalid OTP");
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setMobileOtpAlert(false);
+    }
+  };
+  const handleHealthIdOtp = async (
+    aadhaarInput: string,
+    aadhaarOtpVerify: number
+  ) => {
+    setHealthIdLoading(true);
+    setErrorOtp("");
+    try {
+      await createHealthIdOtp(aadhaarInput, Number(aadhaarOtpVerify));
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorOtp("Invalid OTP");
+        setAadhaarOtpInput(true); // Set the error message
+      } else {
+        setErrorOtp("An unknown error occurred");
+      }
+    } finally {
+      setHealthIdLoading(false);
+    }
+  };
   return (
     <div>
       <Modal
@@ -634,8 +673,8 @@ function ModalPopup({
             </Select>
             <LoadingButton
               variant="outlined"
-              loading={loading}
-              disabled={loading}
+              loading={confirmLoading}
+              disabled={confirmLoading}
               onClick={() => handleInitAuth(verifyBy, searchMobile)}
             >
               Confirm
@@ -675,7 +714,11 @@ function ModalPopup({
                 </LoadingButton>
               </>
             )}
-
+            {mobileAuthError && !searchEnabled && (
+              <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
+                {mobileAuthError}
+              </Typography>
+            )}
             {verifyBy === "AADHAAR_OTP" && (
               <>
                 <TextField
@@ -699,6 +742,11 @@ function ModalPopup({
                   Verify
                 </LoadingButton>
               </>
+            )}
+            {aadhaarAuthError && !searchEnabled && (
+              <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
+                {aadhaarAuthError}
+              </Typography>
             )}
           </Box>
 
@@ -823,12 +871,6 @@ function ModalPopup({
                   >
                     {[...new Array(1)].map((_, index) => (
                       <React.Fragment key={index}>
-                        <Checkbox
-                          checked={checkedItems.includes(index)}
-                          onChange={() => handleToggle(index)}
-                          color="primary"
-                        />
-                        I hereby declare that: <br />
                         {/* Add your consent content here */}
                         <ul>
                           <li>
@@ -889,6 +931,29 @@ function ModalPopup({
                             as stated above and hereby provide my consent for
                             the aforementioned purposes.
                           </li>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 5)}
+                              onChange={() => handleToggle(index + 5)}
+                              color="primary"
+                            />
+                            I,(abdmadmin@picasoid.co.in), confirm that I have
+                            duly informed and explained the beneficiary of the
+                            contents of consent for aforementioned purposes. I,
+                            have been explained about the consent as stated
+                            above and hereby provide my consent for the
+                            aforementioned purposes.
+                          </li>
+                          <li>
+                            <Checkbox
+                              checked={checkedItems.includes(index + 6)}
+                              onChange={() => handleToggle(index + 6)}
+                              color="primary"
+                            />
+                            I, have been explained about the consent as stated
+                            above and hereby provide my consent for the
+                            aforementioned purposes.
+                          </li>
                         </ul>
                       </React.Fragment>
                     ))}
@@ -948,10 +1013,10 @@ function ModalPopup({
                   />
                   <LoadingButton
                     variant="contained"
-                    disabled={loading}
-                    loading={loading}
+                    disabled={healthIdLoading}
+                    loading={healthIdLoading}
                     onClick={() =>
-                      createHealthIdOtp(
+                      handleHealthIdOtp(
                         aadhaarInputValue,
                         Number(aadhharOtpVerfiy)
                       )
@@ -960,13 +1025,12 @@ function ModalPopup({
                     Verify
                   </LoadingButton>
                 </Box>
-                {
+                {errorOtp && (
                   <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
-                    {errorMessage &&
-                      errorMessage.message &&
-                      errorMessage.message}
+                    {errorOtp}
                   </Typography>
-                }
+                )}
+
                 {showButton ? (
                   <>
                     <Button
@@ -1322,7 +1386,7 @@ function ModalPopup({
                   }}
                   variant="contained"
                   size="small"
-                  loading={loading}
+                  loading={healthIdLoading}
                   onClick={() =>
                     generateHealthIdPreVerified(aadhaarInputValue, email)
                   }
@@ -1359,7 +1423,7 @@ function ModalPopup({
                   }}
                   variant="contained"
                   size="small"
-                  loading={loading}
+                  loading={healthIdLoading}
                   onClick={() =>
                     generateHealthIdPreVerified(aadhaarInputValue, email)
                   }

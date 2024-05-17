@@ -306,6 +306,12 @@ export const createHealthId = async (
       body: JSON.stringify(data),
     }
   );
+  if (!response.ok) {
+    const error = await response.json();
+    console.log(error);
+
+    throw new Error("Invalid OTP");
+  }
   const result = await response.json();
   dispatch(createHealthIdOtp(result));
   console.log(result);
@@ -617,6 +623,12 @@ export const confirmMobileAuth = async (
       body: JSON.stringify(data),
     }
   );
+  if (!response.ok) {
+    const error = await response.json();
+    console.log(error);
+
+    throw new Error("Invalid OTP");
+  }
   const result = await response.json();
   console.log(result);
 };
@@ -638,6 +650,12 @@ export const confirmAadhaarAuth = async (
       body: JSON.stringify(data),
     }
   );
+  if (!response.ok) {
+    const error = await response.json();
+    console.log(error);
+
+    throw new Error("Invalid OTP");
+  }
   const result = await response.json();
   console.log(result);
 };
