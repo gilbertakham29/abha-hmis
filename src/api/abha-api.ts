@@ -4,6 +4,7 @@ import {
   getAbhaQrCode,
   setSearchResult,
   setPatientResult,
+  setProfileHipcodeandTokenNumber,
   abhaRegistration,
   createHealthIdOtp,
   verifyAadhaar,
@@ -658,4 +659,33 @@ export const confirmAadhaarAuth = async (
   }
   const result = await response.json();
   console.log(result);
+};
+export const getProfileByHipCodeandTokenNumber = async (
+  hipCodeInput: string,
+  tokenNumberInput: string,
+  dispatch: AppDispatch
+) => {
+  const data = {
+    hipCode: hipCodeInput,
+    tokenNumber: tokenNumberInput,
+  };
+  const response = await fetch(
+    `https://dev-care-connect-api.azurewebsites.net/api/AbhaRegistration/GetProfileByHipcodeAndTokenNumber?hipCode=${data.hipCode}&tokenNumber=${data.tokenNumber}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+  if (!response.ok) {
+    const error = await response.json();
+    console.log(error);
+
+    throw new Error("Invalid HipCode or TokenNumber");
+  }
+  const result = await response.json();
+  console.log(result);
+  dispatch(setProfileHipcodeandTokenNumber(result));
 };

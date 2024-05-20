@@ -26,6 +26,14 @@ export interface DemographicResult {
   healthIdNumber: string;
   healthId: string;
 }
+export interface ProfileResultByHipCodeandTokenNumber {
+  name: string;
+  gender: string;
+  dob: string;
+  mobileNumber: string;
+  healthIDNumber: string;
+  healthID: string;
+}
 export interface PatientResult {
   name: string;
   pinCode: string;
@@ -71,6 +79,7 @@ export interface AbhaCardList {
 }
 interface State {
   searchResult: DemographicResult;
+  profileResultByHipandTokeNumber: ProfileResultByHipCodeandTokenNumber;
   initAuthResult: InitAuth;
   patientResult: PatientResult;
   patientList: PatientListData[];
@@ -107,6 +116,14 @@ const initialState: State = {
     mobile: "",
     healthIdNumber: "",
     healthId: "",
+  },
+  profileResultByHipandTokeNumber: {
+    name: "",
+    gender: "",
+    dob: "",
+    mobileNumber: "",
+    healthIDNumber: "",
+    healthID: "",
   },
   initAuthResult: {
     txnId: "",
@@ -185,6 +202,12 @@ const rootReducerSlice = createSlice({
   reducers: {
     setSearchResult(state, action: PayloadAction<DemographicResult>) {
       state.searchResult = action.payload;
+    },
+    setProfileHipcodeandTokenNumber(
+      state,
+      action: PayloadAction<ProfileResultByHipCodeandTokenNumber>
+    ) {
+      state.profileResultByHipandTokeNumber = action.payload;
     },
     setInitAuth(state, action: PayloadAction<InitAuth>) {
       state.initAuthResult = action.payload;
@@ -276,6 +299,7 @@ const rootReducerSlice = createSlice({
 
 export const {
   setSearchResult,
+  setProfileHipcodeandTokenNumber,
   setInitAuth,
   setPatientResult,
   getPatientList,
