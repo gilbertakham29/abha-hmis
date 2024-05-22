@@ -97,3 +97,7 @@ export const mobileOtpError = (mobileOtpErrorMessage: object) => ({
   type: "MOBILE_OTP_ERROR",
   payload: mobileOtpErrorMessage,
 });
+export const verifyHealthOtpError = (healthOtpErrorMessage: object) => ({
+  type: "HEALTH_ID_ERROR",
+  payload: healthOtpErrorMessage,
+});

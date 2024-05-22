@@ -1,5 +1,6 @@
 import Navbar from "./Navbar";
 import DownloadIcon from "@mui/icons-material/Download";
+
 import {
   Box,
   Tabs,
@@ -322,7 +323,9 @@ function PatientDashboard() {
                 required
                 variant="outlined"
                 value={
-                  age || patientAge ? age || patientAge + " years" : ageNum
+                  age || patientAge
+                    ? age + " years" || patientAge + " years"
+                    : ageNum
                 }
                 onChange={handleAge}
                 id="outlined-required"
@@ -574,9 +577,19 @@ function PatientDashboard() {
               >
                 Scan Qr
               </Button>
-              {searchResultData.healthIdNumber ||
-                (patientResultData.healthIDNumber && (
-                  <Box sx={{ mt: 1 }}>
+              {(searchResultData.healthIdNumber ||
+                patientResultData.healthIDNumber) &&
+                (searchResultData.healthIdNumber ||
+                  patientResultData.healthIDNumber) && (
+                  <Box
+                    sx={{
+                      mt: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "flex-start",
+                      alignItems: "flex-start",
+                    }}
+                  >
                     <Typography>ABHA ID:</Typography>
 
                     <Typography sx={{ color: "red" }}>
@@ -588,7 +601,7 @@ function PatientDashboard() {
                       {searchResultData.healthId || patientResultData.healthID}
                     </Typography>
                   </Box>
-                ))}
+                )}
             </Box>
 
             <Button variant="contained" onClick={handleSubmit} sx={{ mt: 2 }}>

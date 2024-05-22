@@ -25,6 +25,7 @@ import {
   mobileNumberError,
   mobileOtpSuccess,
   mobileOtpError,
+  verifyHealthOtpError,
 } from "../redux/reducer";
 
 import { AppDispatch } from "../redux/store";
@@ -338,6 +339,10 @@ export const verifyOtpandCreateHealthId = async (
   );
   const result = await response.json();
   dispatch(verifyMobileOtpCreateHealthId(result));
+
+  if (!response.ok) {
+    dispatch(verifyHealthOtpError(result));
+  }
   console.log(result);
 };
 export const initiateConsent = async (

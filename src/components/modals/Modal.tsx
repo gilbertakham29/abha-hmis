@@ -192,6 +192,9 @@ function ModalPopup({
   type initAuthResultData = {
     txnId: string;
   };
+  type healthIdError = {
+    message: string;
+  };
   type RootState = {
     searchResult: getDemographicsResult;
     errorMessage: otpErrorType;
@@ -201,11 +204,16 @@ function ModalPopup({
     mobileOtpSuccess: mobileOtpSuccessType;
     mobileOtpError: mobileOtpErrorType;
     initAuthResult: initAuthResultData;
+    verifyHealthOtpError: healthIdError;
   };
   const initAuthResult = useSelector(
     (state: RootState) => state.initAuthResult
   );
   console.log(initAuthResult.txnId);
+  const verifyHealthOtpError = useSelector(
+    (state: RootState) => state.verifyHealthOtpError
+  );
+  console.log(verifyHealthOtpError);
 
   const searchResult = useSelector((state: RootState) => state.searchResult);
   console.log(searchResult);
@@ -445,28 +453,33 @@ function ModalPopup({
     aadhaarInput: string,
     abhaAddressInput: string
   ) => {
-    setHealthIdLoading(true);
-    const result = await verifyOtpandCreateHealthId(
-      aadhaarInput,
-      abhaAddressInput,
-      dispatch
-    );
-
-    setTimeout(async () => {
-      setHealthIdLoading(false);
-      setOpenDialog(true);
-      const result = await handleSearch(aadhaarInput, dispatch);
-
-      const [abhaCard, abhaQr] = await Promise.all([
-        getAbhaCard(result.abhaAccountID, dispatch),
-        getQrcode(result.abhaAccountID, dispatch),
-      ]);
-      console.log(abhaCard, abhaQr);
-      setTimeout(() => {
+    try {
+      setHealthIdLoading(true);
+      await verifyOtpandCreateHealthId(
+        aadhaarInput,
+        abhaAddressInput,
+        dispatch
+      );
+    } catch (err) {
+      if (err instanceof Error) {
+        setHealthIdLoading(false);
         setOpenDialog(false);
-      }, 3000);
-    }, 2000);
-    console.log(result);
+        setMobileNumber(true);
+      } else {
+        const result = await handleSearch(aadhaarInput, dispatch);
+        const [abhaCard, abhaQr] = await Promise.all([
+          getAbhaCard(result.abhaAccountID, dispatch),
+          getQrcode(result.abhaAccountID, dispatch),
+        ]);
+        console.log(abhaCard, abhaQr);
+        setTimeout(() => {
+          setOpenDialog(false);
+        }, 3000);
+      }
+    } finally {
+      setHealthIdLoading(false);
+      setOpenDialog(false);
+    }
   };
   const handleAdhaarInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     let aadhaarValue = e.target.value;
@@ -1394,8 +1407,14 @@ function ModalPopup({
                 >
                   Enter
                 </LoadingButton>
+                <Typography sx={{ fontSize: "0.9rem", color: "red" }}>
+                  {verifyHealthOtpError &&
+                    verifyHealthOtpError.message &&
+                    verifyHealthOtpError.message}
+                </Typography>
               </Box>
             )}
+            {}
             {mobileOtpSuccess.message && (
               <Box
                 sx={{

@@ -105,6 +105,7 @@ interface State {
   mobileNumberError: object;
   mobileOtpSuccess: object;
   mobileOtpError: object;
+  verifyHealthOtpError: object;
 }
 
 const initialState: State = {
@@ -194,6 +195,7 @@ const initialState: State = {
   mobileNumberError: {},
   mobileOtpSuccess: {},
   mobileOtpError: {},
+  verifyHealthOtpError: {},
 };
 
 const rootReducerSlice = createSlice({
@@ -294,6 +296,9 @@ const rootReducerSlice = createSlice({
     mobileOtpError: (state, action: PayloadAction<object>) => {
       state.mobileOtpError = action.payload;
     },
+    verifyHealthOtpError: (state, action: PayloadAction<object>) => {
+      state.verifyHealthOtpError = action.payload;
+    },
   },
 });
 
@@ -326,6 +331,7 @@ export const {
   mobileNumberError,
   mobileOtpSuccess,
   mobileOtpError,
+  verifyHealthOtpError,
 } = rootReducerSlice.actions;
 
 export default rootReducerSlice.reducer;
